@@ -20,25 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import numpy
+import unittest
 
-class Storage(object):
-    """ Interface for storage adapters. """
+from nearpy.hashes import RandomBinaryProjections
 
-    def store_vector(bucket_key, v, data):
-        """
-        Stores vector and JSON-serializable data in bucket with specified key.
-        """
-        raise NotImplementedError
 
-    def get_bucket(self, bucket_key):
-        """
-        Returns bucket content as list of tuples (vector, data).
-        """
-        raise NotImplementedError
+class TestRandomBinaryProjections(unittest.TestCase):
 
-    def clean_buckets(self):
-        """
-        Removes all buckets and their content.
-        """
-        raise NotImplementedError
+    def setUp(self):
+        self.rbp = RandomBinaryProjections(10)
+        self.rbp.reset(100)
 
+    def test_hash_format(self):
+        h = self.rbp.hash_vector(numpy.random.randn(100))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+        self.assertEqual(len(h[0]), 10)
+        for c in h[0]:
+            self.assertTrue(c == '1' or c == '0')
+
+    def test_hash_deterministic(self):
+        x = numpy.random.randn(100)
+        first_hash = self.rbp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
+
+
+if __name__ == '__main__':
+    unittest.main()

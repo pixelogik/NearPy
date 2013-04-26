@@ -20,25 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from vectorfilter import VectorFilter
 
-class Storage(object):
-    """ Interface for storage adapters. """
 
-    def store_vector(bucket_key, v, data):
-        """
-        Stores vector and JSON-serializable data in bucket with specified key.
-        """
-        raise NotImplementedError
+class NearestFilter(VectorFilter):
+    """
+    Sorts vectors with respect to distance and returns the N nearest.
+    """
 
-    def get_bucket(self, bucket_key):
+    def __init__(self, N):
         """
-        Returns bucket content as list of tuples (vector, data).
+        Keeps the count threshold.
         """
-        raise NotImplementedError
+        self.N = N
 
-    def clean_buckets(self):
+    def filter_vectors(self, input_list):
         """
-        Removes all buckets and their content.
+        Returns subset of specified input list.
         """
-        raise NotImplementedError
-
+        try:
+            # Return filtered (vector, data, distance )tuple list. Will fail
+            # if input is list of (vector, data) tuples.
+            sorted_list = sorted(input_list, key=lambda x: x[2])
+            return sorted_list[:self.N]
+        except:
+            # Otherwise just return input list
+            return input_list

@@ -21,3 +21,5 @@
 # THE SOFTWARE.
 
 from distance import Distance
+from angular import AngularDistance
+from euclidean import EuclideanDistance

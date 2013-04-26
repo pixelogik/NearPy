@@ -14,3 +14,15 @@ unittest.TextTestRunner(verbosity=2).run(suite)
 suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestStorage)
 unittest.TextTestRunner(verbosity=2).run(suite)
+
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestEuclideanDistance)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestAngularDistance)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestVectorFilters)
+unittest.TextTestRunner(verbosity=2).run(suite)

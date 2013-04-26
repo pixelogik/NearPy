@@ -27,8 +27,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from storage import Storage
 
-class MemoryStorage(object):
+
+class MemoryStorage(Storage):
     """ Simple implementation using python dicts. """
 
     def __init__(self):

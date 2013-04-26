@@ -20,25 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from vectorfilter import VectorFilter
 
-class Storage(object):
-    """ Interface for storage adapters. """
 
-    def store_vector(bucket_key, v, data):
-        """
-        Stores vector and JSON-serializable data in bucket with specified key.
-        """
-        raise NotImplementedError
+class DistanceThresholdFilter(VectorFilter):
+    """
+    Rejects vectors with a distance over the threshold.
+    """
 
-    def get_bucket(self, bucket_key):
+    def __init__(self, distance_threshold):
         """
-        Returns bucket content as list of tuples (vector, data).
+        Keeps the distance threshold
         """
-        raise NotImplementedError
+        self.distance_threshold = distance_threshold
 
-    def clean_buckets(self):
+    def filter_vectors(self, input_list):
         """
-        Removes all buckets and their content.
+        Returns subset of specified input list.
         """
-        raise NotImplementedError
-
+        try:
+            # Return filtered (vector, data, distance )tuple list. Will fail
+            # if input is list of (vector, data) tuples.
+            return [x for x in input_list if x[2] < self.distance_threshold]
+        except:
+            # Otherwise just return input list
+            return input_list

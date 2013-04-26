@@ -24,7 +24,8 @@
 class Distance(object):
     """ Interface for distance functions. """
 
-    def __init__(self):
-        pass
-
-
+    def distance(self, x, y):
+        """
+        Computes distance measure between vectors x and y. Returns float.
+        """
+        raise NotImplementedError

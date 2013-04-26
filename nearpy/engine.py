@@ -23,19 +23,39 @@
 import json
 
 from hashes import RandomBinaryProjections
-from filters import VectorFilter
-from distances import Distance
+from filters import NearestFilter
+from distances import EuclideanDistance
 from storage import MemoryStorage
+
 
 class Engine(object):
     """
     Objects with this type perform the actual ANN search and vector indexing.
     They can be configured by selecting implementations of the Hash, Distance,
     Filter and Storage interfaces.
+
+    There are four different modes of the engine:
+
+        (1) Full configuration - All arguments are defined.
+                In this case the distance and vector filters
+                are applied to the bucket contents to deliver the
+                resulting list of filtered (vector, data, distance) tuples.
+        (2) No distance - The distance argument is None.
+                In this case only the vector filter is applied to
+                the bucket contents and the result is a list of
+                filtered (vector, data) tuples.
+        (3) No vector filter - The vector_filter argument is None.
+                In this case only the distance is applied to
+                the bucket contents and the result is a list of
+                unsorted/unfiltered (vector, data, distance) tuples.
+        (4) No vector filter and no distance - Both arguments are None.
+                In this case the result is just the content from the
+                buckets as an unsorted/unfiltered list of (vector, data)
+                tuples.
     """
 
     def __init__(self, dim, lshash=RandomBinaryProjections(10),
-                 distance=Distance(), vector_filter=VectorFilter(),
+                 distance=EuclideanDistance(), vector_filter=NearestFilter(10),
                  storage=MemoryStorage()):
         """ Keeps the configuration. """
         self.lshash = lshash
@@ -54,22 +74,38 @@ class Engine(object):
         """
         # Get list of bucket keys from hash
         bucket_keys = self.lshash.hash_vector(v)
-        # Stpre vector and data in each bucket
+        # Store vector and data in each bucket
         for bucket_key in bucket_keys:
             self.storage.store_vector(bucket_key, v, data)
 
     def neighbours(self, v):
         """
         Hashes vector v, collects all candidate vectors from the matching
-        buckets in storage, applys the distance function and finally the filter
-        function to construct the returned list of (vector, data_key) items.
+        buckets in storage, applys the (optional) distance function and
+        finally the (optional) filter function to construct the returned list
+        of either (vector, data, distance) tuples or (vector, data) tuples.
         """
-        pass
+        # Get list of bucket keys from hash
+        bucket_keys = self.lshash.hash_vector(v)
 
+        # Collect candidates from all buckets
+        candidates = []
+        for bucket_key in bucket_keys:
+            bucket_content = self.storage.get_bucket(bucket_key)
+            candidates.extend(bucket_content)
 
+        # Apply distance implementation if specified
+        if self.distance:
+            candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
+                          in candidates]
 
+        # Apply vector filter if specified and return filtered list
+        if self.vector_filter:
+            return self.vector_filter.filter_vectors(candidates)
 
+        # If there is no vector filter, just return list of candidates
+        return candidates
 
-
-
-
+    def clean_buckets(self):
+        """ Clears buckets in storage (removes all vectors and their data). """
+        self.storage.clean_buckets()

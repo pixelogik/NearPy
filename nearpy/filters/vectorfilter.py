@@ -22,8 +22,26 @@
 
 
 class VectorFilter(object):
-    """ Interface for vector-list filters. """
+    """
+    Interface for vector-list filters. They get either (vector, data, distance)
+    tupes or (vector, data) tuples and return subsets of them.
 
-    def __init__(self):
-        pass
+    Some filters work on lists of (vector, data, distance) tuples, others work
+    on lists of (vector, data) tuples. Depending on the configuration of the
+    engine, you have to select the right kind.
 
+    Which kind you need is very simple to determine: If you use a Distance
+    implementation, you have to use a filter that takes
+    (vector, data, distance) tuples. If you however decide to not use Distance
+    (Engine with distance=None), you have to use a vector filter that processes
+    lists of (vector, data) tuples.
+
+    However all filters can handle both input types. They will just return the
+    input list if their filter mechanism does not apply on the input type.
+    """
+
+    def filter_vectors(self, input_list):
+        """
+        Returns subset of specified input list.
+        """
+        raise NotImplementedError

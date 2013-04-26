@@ -29,10 +29,21 @@ from nearpy import Engine
 class TestEngine(unittest.TestCase):
 
     def setUp(self):
-        self.engine = Engine(100)
+        self.engine = Engine(1000)
 
-    def test_something(self):
-        print 'jaaa'
+    def test_retrieval(self):
+        for k in range(100):
+            self.engine.clean_buckets()
+            x = numpy.random.randn(1000)
+            x_data = 'data'
+            self.engine.store_vector(x, x_data)
+            n = self.engine.neighbours(x)
+            y = n[0][0]
+            y_data = n[0][1]
+            y_distance = n[0][2]
+            self.assertTrue((y == x).all())
+            self.assertEqual(y_data, x_data)
+            self.assertEqual(y_distance, 0.0)
 
 
 if __name__ == '__main__':

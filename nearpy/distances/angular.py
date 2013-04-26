@@ -20,25 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import numpy
 
-class Storage(object):
-    """ Interface for storage adapters. """
+from distance import Distance
 
-    def store_vector(bucket_key, v, data):
-        """
-        Stores vector and JSON-serializable data in bucket with specified key.
-        """
-        raise NotImplementedError
 
-    def get_bucket(self, bucket_key):
-        """
-        Returns bucket content as list of tuples (vector, data).
-        """
-        raise NotImplementedError
+class AngularDistance(Distance):
+    """  Uses 1-cos(angle(x,y)) as distance measure. """
 
-    def clean_buckets(self):
+    def distance(self, x, y):
         """
-        Removes all buckets and their content.
+        Computes distance measure between vectors x and y. Returns float.
         """
-        raise NotImplementedError
-
+        return 1.0 - numpy.dot(x, y) / (numpy.linalg.norm(x) *
+                                        numpy.linalg.norm(y))
