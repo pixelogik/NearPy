@@ -26,3 +26,7 @@ unittest.TextTestRunner(verbosity=2).run(suite)
 suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestVectorFilters)
 unittest.TextTestRunner(verbosity=2).run(suite)
+
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestRecallExperiment)
+unittest.TextTestRunner(verbosity=2).run(suite)

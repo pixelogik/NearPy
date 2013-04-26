@@ -20,9 +20,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from hashes_tests import TestRandomBinaryProjections
-from engine_tests import TestEngine
-from storage_tests import TestStorage
-from distances_tests import TestEuclideanDistance, TestAngularDistance
-from filters_tests import TestVectorFilters
-from experiments_tests import TestRecallExperiment
+from recallexperiment import RecallExperiment
