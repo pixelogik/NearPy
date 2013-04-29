@@ -23,7 +23,7 @@
 import numpy
 import unittest
 
-from nearpy.filters import NearestFilter, DistanceThresholdFilter
+from nearpy.filters import NearestFilter, DistanceThresholdFilter, UniqueFilter
 
 
 class TestVectorFilters(unittest.TestCase):
@@ -41,6 +41,7 @@ class TestVectorFilters(unittest.TestCase):
 
         self.threshold_filter = DistanceThresholdFilter(1.0)
         self.nearest_filter = NearestFilter(5)
+        self.unique = UniqueFilter()
 
     def test_thresholding(self):
         result = self.threshold_filter.filter_vectors(self.V)
@@ -57,6 +58,16 @@ class TestVectorFilters(unittest.TestCase):
         self.assertTrue(self.V[4] in result)
         self.assertTrue(self.V[2] in result)
         self.assertTrue(self.V[3] in result)
+
+    def test_unique(self):
+        W = self.V
+        W.append((numpy.array([7]), 'data', 2.8))
+        W.append((numpy.array([0]), 'data', 2.8))
+        W.append((numpy.array([1]), 'data', 2.8))
+        W.append((numpy.array([6]), 'data', 2.8))
+
+        result = self.unique.filter_vectors(W)
+        self.assertEqual(len(result), 8)
 
 
 if __name__ == '__main__':

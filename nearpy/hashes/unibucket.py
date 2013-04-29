@@ -20,4 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from recallprecisionexperiment import RecallPrecisionExperiment
+import numpy
+
+from lshash import LSHash
+
+
+class UniBucket(LSHash):
+    """
+    Puts alls vectors in one bucket. This is used for testing
+    the engines and experiments.
+    """
+
+    def __init__(self, hash_name):
+        """ Just keeps the name. """
+        super(UniBucket, self).__init__(hash_name)
+        self.dim = None
+
+    def reset(self, dim):
+        """ Resets / Initializes the hash for the specified dimension. """
+        self.dim = dim
+
+    def hash_vector(self, v):
+        """
+        Hashes the vector and returns the bucket key as string.
+        """
+        # Return bucket key identical to vector string representation
+        return [self.hash_name+'']

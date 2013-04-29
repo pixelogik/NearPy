@@ -20,4 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from recallprecisionexperiment import RecallPrecisionExperiment
+import numpy
+
+from vectorfilter import VectorFilter
+
+
+class UniqueFilter(VectorFilter):
+    """
+    Makes sure that each vectors is only once in the vector list. Works on
+    both types of vector listst - (vector, data, distance) and
+    (vector, data).
+    """
+
+    def __init__(self):
+        pass
+
+    def filter_vectors(self, input_list):
+        """
+        Returns subset of specified input list.
+        """
+        unique_dict = {}
+        for v in input_list:
+            unique_dict[numpy.array_str(v[0])] = v
+        return unique_dict.values()

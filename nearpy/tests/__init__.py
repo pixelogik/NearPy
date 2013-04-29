@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from hashes_tests import TestRandomBinaryProjections
+from hashes_tests import TestRandomBinaryProjections, TestRandomDiscretizedProjections
 from engine_tests import TestEngine
 from storage_tests import TestStorage
 from distances_tests import TestEuclideanDistance, TestAngularDistance

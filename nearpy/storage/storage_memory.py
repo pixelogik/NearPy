@@ -36,24 +36,37 @@ class MemoryStorage(Storage):
     def __init__(self):
         self.buckets = {}
 
-    def store_vector(self, bucket_key, v, data):
+    def store_vector(self, hash_name, bucket_key, v, data):
         """
         Stores vector and JSON-serializable data in bucket with specified key.
         """
-        if not bucket_key in self.buckets:
-            self.buckets[bucket_key] = []
-        self.buckets[bucket_key].append((v, data))
+        #print 'STORAGE: storing in hash %s with bucket key %s:' % (hash_name, bucket_key)
+        #print v
 
-    def get_bucket(self, bucket_key):
+        if not hash_name in self.buckets:
+            self.buckets[hash_name] = {}
+
+        if not bucket_key in self.buckets[hash_name]:
+            self.buckets[hash_name][bucket_key] = []
+        self.buckets[hash_name][bucket_key].append((v, data))
+
+    def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
         """
-        if bucket_key in self.buckets:
-            return self.buckets[bucket_key]
+        if hash_name in self.buckets:
+            if bucket_key in self.buckets[hash_name]:
+                return self.buckets[hash_name][bucket_key]
         return []
 
-    def clean_buckets(self):
+    def clean_buckets(self, hash_name):
         """
-        Removes all buckets and their content.
+        Removes all buckets and their content for specified hash.
+        """
+        self.buckets[hash_name] = {}
+
+    def clean_all_buckets(self):
+        """
+        Removes all buckets from all hashes and their content.
         """
         self.buckets = {}

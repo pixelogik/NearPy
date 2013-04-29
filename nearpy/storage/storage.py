@@ -24,21 +24,26 @@
 class Storage(object):
     """ Interface for storage adapters. """
 
-    def store_vector(bucket_key, v, data):
+    def store_vector(self, hash_name, bucket_key, v, data):
         """
         Stores vector and JSON-serializable data in bucket with specified key.
         """
         raise NotImplementedError
 
-    def get_bucket(self, bucket_key):
+    def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
         """
         raise NotImplementedError
 
-    def clean_buckets(self):
+    def clean_buckets(self, hash_name):
         """
         Removes all buckets and their content.
         """
         raise NotImplementedError
 
+    def clean_all_buckets(self):
+        """
+        Removes all buckets and their content.
+        """
+        raise NotImplementedError

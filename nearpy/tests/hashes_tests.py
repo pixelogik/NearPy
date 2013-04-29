@@ -23,13 +23,13 @@
 import numpy
 import unittest
 
-from nearpy.hashes import RandomBinaryProjections
+from nearpy.hashes import RandomBinaryProjections, RandomDiscretizedProjections
 
 
 class TestRandomBinaryProjections(unittest.TestCase):
 
     def setUp(self):
-        self.rbp = RandomBinaryProjections(10)
+        self.rbp = RandomBinaryProjections('testHash', 10)
         self.rbp.reset(100)
 
     def test_hash_format(self):
@@ -39,6 +39,25 @@ class TestRandomBinaryProjections(unittest.TestCase):
         self.assertEqual(len(h[0]), 10)
         for c in h[0]:
             self.assertTrue(c == '1' or c == '0')
+
+    def test_hash_deterministic(self):
+        x = numpy.random.randn(100)
+        first_hash = self.rbp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
+
+
+class TestRandomDiscretizedProjections(unittest.TestCase):
+
+    def setUp(self):
+        self.rbp = RandomDiscretizedProjections('testHash', 10, 0.1)
+        self.rbp.reset(100)
+
+    def test_hash_format(self):
+        h = self.rbp.hash_vector(numpy.random.randn(100))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+        print h[0]
 
     def test_hash_deterministic(self):
         x = numpy.random.randn(100)

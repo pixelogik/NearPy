@@ -33,7 +33,7 @@ class TestEngine(unittest.TestCase):
 
     def test_retrieval(self):
         for k in range(100):
-            self.engine.clean_buckets()
+            self.engine.clean_all_buckets()
             x = numpy.random.randn(1000)
             x_data = 'data'
             self.engine.store_vector(x, x_data)

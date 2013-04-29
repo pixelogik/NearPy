@@ -41,7 +41,7 @@ class Engine(object):
                 are applied to the bucket contents to deliver the
                 resulting list of filtered (vector, data, distance) tuples.
         (2) No distance - The distance argument is None.
-                In this case only the vector filter is applied to
+                In this case only the vector filters are applied to
                 the bucket contents and the result is a list of
                 filtered (vector, data) tuples.
         (3) No vector filter - The vector_filter argument is None.
@@ -54,17 +54,19 @@ class Engine(object):
                 tuples.
     """
 
-    def __init__(self, dim, lshash=RandomBinaryProjections(10),
-                 distance=EuclideanDistance(), vector_filter=NearestFilter(10),
+    def __init__(self, dim, lshashes=[RandomBinaryProjections('default', 10)],
+                 distance=EuclideanDistance(),
+                 vector_filters=[NearestFilter(10)],
                  storage=MemoryStorage()):
         """ Keeps the configuration. """
-        self.lshash = lshash
+        self.lshashes = lshashes
         self.distance = distance
-        self.vector_filter = vector_filter
+        self.vector_filters = vector_filters
         self.storage = storage
 
-        # Initialize hash for the data space dimension.
-        self.lshash.reset(dim)
+        # Initialize all hashes for the data space dimension.
+        for lshash in self.lshashes:
+            lshash.reset(dim)
 
     def store_vector(self, v, data=None):
         """
@@ -72,11 +74,11 @@ class Engine(object):
         The data argument must be JSON-serializable. It is stored with the
         vector and will be returned in search results.
         """
-        # Get list of bucket keys from hash
-        bucket_keys = self.lshash.hash_vector(v)
-        # Store vector and data in each bucket
-        for bucket_key in bucket_keys:
-            self.storage.store_vector(bucket_key, v, data)
+        # Store vector in each bucket of all hashes
+        for lshash in self.lshashes:
+            for bucket_key in lshash.hash_vector(v):
+                self.storage.store_vector(lshash.hash_name, bucket_key,
+                                          v, data)
 
     def neighbours(self, v):
         """
@@ -85,27 +87,35 @@ class Engine(object):
         finally the (optional) filter function to construct the returned list
         of either (vector, data, distance) tuples or (vector, data) tuples.
         """
-        # Get list of bucket keys from hash
-        bucket_keys = self.lshash.hash_vector(v)
-
-        # Collect candidates from all buckets
+        # Collect candidates from all buckets from all hashes
         candidates = []
-        for bucket_key in bucket_keys:
-            bucket_content = self.storage.get_bucket(bucket_key)
-            candidates.extend(bucket_content)
+        for lshash in self.lshashes:
+            for bucket_key in lshash.hash_vector(v):
+                # TODO: Potential duplicates here with multiple hashes!
+                bucket_content = self.storage.get_bucket(lshash.hash_name,
+                                                         bucket_key)
+                candidates.extend(bucket_content)
 
         # Apply distance implementation if specified
         if self.distance:
             candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
                           in candidates]
 
-        # Apply vector filter if specified and return filtered list
-        if self.vector_filter:
-            return self.vector_filter.filter_vectors(candidates)
+        # Apply vector filters if specified and return filtered list
+        if self.vector_filters:
+            filter_input = candidates
+            for vector_filter in self.vector_filters:
+                filter_input = vector_filter.filter_vectors(filter_input)
+            # Return output of last filter
+            return filter_input
 
         # If there is no vector filter, just return list of candidates
         return candidates
 
-    def clean_buckets(self):
+    def clean_all_buckets(self):
         """ Clears buckets in storage (removes all vectors and their data). """
-        self.storage.clean_buckets()
+        self.storage.clean_all_buckets()
+
+    def clean_buckets(self, hash_name):
+        """ Clears buckets in storage (removes all vectors and their data). """
+        self.storage.clean_buckets(hash_name)

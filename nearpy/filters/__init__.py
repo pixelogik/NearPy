@@ -23,3 +23,4 @@
 from vectorfilter import VectorFilter
 from distancethresholdfilter import DistanceThresholdFilter
 from nearestfilter import NearestFilter
+from uniquefilter import UniqueFilter

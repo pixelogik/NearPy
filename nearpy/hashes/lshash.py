@@ -24,6 +24,13 @@
 class LSHash(object):
     """ Interface for locality-sensitive hashes. """
 
+    def __init__(self, hash_name):
+        """
+        The hash name is used in storage to store buckets of
+        different hashes without collision.
+        """
+        self.hash_name = hash_name
+
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
         raise NotImplementedError
@@ -35,5 +42,4 @@ class LSHash(object):
         one or many bucket keys.
         """
         raise NotImplementedError
-
 

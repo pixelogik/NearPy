@@ -35,8 +35,8 @@ class TestStorage(unittest.TestCase):
         x = numpy.random.randn(100, 1)
         bucket_key = '23749283743928748'
         x_data = ['one', 'two', 'three']
-        self.memory.store_vector(bucket_key, x, x_data)
-        X = self.memory.get_bucket(bucket_key)
+        self.memory.store_vector('testHash', bucket_key, x, x_data)
+        X = self.memory.get_bucket('testHash', bucket_key)
         self.assertEqual(len(X), 1)
         y = X[0][0]
         y_data = X[0][1]
@@ -48,8 +48,8 @@ class TestStorage(unittest.TestCase):
         self.assertEqual(len(y_data), len(x_data))
         for k in range(3):
             self.assertEqual(y_data[k], x_data[k])
-        self.memory.clean_buckets()
-        self.assertEqual(self.memory.get_bucket(bucket_key), [])
+        self.memory.clean_all_buckets()
+        self.assertEqual(self.memory.get_bucket('testHash', bucket_key), [])
 
 
 if __name__ == '__main__':

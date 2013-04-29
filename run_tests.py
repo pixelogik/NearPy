@@ -8,6 +8,10 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
 unittest.TextTestRunner(verbosity=2).run(suite)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestRandomDiscretizedProjections)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
+suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestEngine)
 unittest.TextTestRunner(verbosity=2).run(suite)
 
@@ -30,3 +34,4 @@ unittest.TextTestRunner(verbosity=2).run(suite)
 suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestRecallExperiment)
 unittest.TextTestRunner(verbosity=2).run(suite)
+

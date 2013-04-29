@@ -27,14 +27,23 @@ class VectorFilter(object):
     tupes or (vector, data) tuples and return subsets of them.
 
     Some filters work on lists of (vector, data, distance) tuples, others work
-    on lists of (vector, data) tuples. Depending on the configuration of the
-    engine, you have to select the right kind.
+    on lists of (vector, data) tuples and others work on both types.
+    Depending on the configuration of the engine, you have to select the right
+    filter chain.
+
+    Filter are chained in the engine, if you specify more than one. This way
+    you can combine their functionalities.
+
+    The default filtes in the engine (see engine.py) are a UniqueFilter
+    followed by a NearestFilter(10). The UniqueFilter makes sure, that the
+    candidate list contains each vector only once and the NearestFilter(10)
+    returns the 10 closest candidates (using the distance).
 
     Which kind you need is very simple to determine: If you use a Distance
-    implementation, you have to use a filter that takes
+    implementation, you have to use filters that take
     (vector, data, distance) tuples. If you however decide to not use Distance
-    (Engine with distance=None), you have to use a vector filter that processes
-    lists of (vector, data) tuples.
+    (Engine with distance=None), you have to use a vector filters that
+    process lists of (vector, data) tuples.
 
     However all filters can handle both input types. They will just return the
     input list if their filter mechanism does not apply on the input type.

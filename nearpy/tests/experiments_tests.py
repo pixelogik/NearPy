@@ -23,22 +23,75 @@
 import numpy
 import unittest
 
-from nearpy.experiments import RecallExperiment
-from nearpy import Engine
+from nearpy.experiments import RecallPrecisionExperiment
+from nearpy.hashes import UniBucket
+from nearpy.filters import NearestFilter
+from nearpy.distances import AngularDistance
 
-from nearpy.distances import EuclideanDistance, AngularDistance
+from nearpy import Engine
 
 
 class TestRecallExperiment(unittest.TestCase):
 
     def setUp(self):
+        self.dim = 1
         self.engines = []
-        self.engines.append(Engine(100, distance=EuclideanDistance()))
-        self.engines.append(Engine(100, distance=AngularDistance()))
+        self.engines.append(Engine(self.dim))
+        self.engines.append(Engine(self.dim, distance=AngularDistance()))
+        self.vectors = numpy.random.randn(self.dim, 100)
 
-    def test_experiment(self):
+    def test_experiment_with_unibucket_1(self):
+        dim = 50
+        vector_count = 100
+        vectors = numpy.random.randn(dim, vector_count)
+        unibucket = UniBucket('testHash')
+        nearest = NearestFilter(10)
+        engine = Engine(self.dim, lshashes=[unibucket],
+                        vector_filters=[nearest])
+        exp = RecallPrecisionExperiment(10, self.vectors, [engine])
+
+        # Both recall and precision must be one in this case
+        self.assertEqual(exp.result[0][0], 1.0)
+        self.assertEqual(exp.result[0][1], 1.0)
+
+    def test_experiment_with_unibucket_2(self):
+        dim = 50
+        vector_count = 100
+        vectors = numpy.random.randn(dim, vector_count)
+        unibucket = UniBucket('testHash')
+        nearest = NearestFilter(10)
+        engine = Engine(self.dim, lshashes=[unibucket],
+                        vector_filters=[nearest])
+        exp = RecallPrecisionExperiment(5, self.vectors, [engine])
+
+        # In this case precision is only 0.5
+        # because the engine returns 10 nearest, but
+        # the experiment only looks for 5 nearest.
+        self.assertEqual(exp.result[0][0], 1.0)
+        self.assertEqual(exp.result[0][1], 0.5)
+
+    def test_experiment_with_unibucket_3(self):
+        dim = 50
+        vector_count = 100
+        vectors = numpy.random.randn(dim, vector_count)
+        unibucket = UniBucket('testHash')
+        nearest = NearestFilter(5)
+        engine = Engine(self.dim, lshashes=[unibucket],
+                        vector_filters=[nearest])
+        exp = RecallPrecisionExperiment(10, self.vectors, [engine])
+
+        # In this case recall is only 0.5
+        # because the engine returns 5 nearest, but
+        # the experiment looks for 10 nearest.
+        self.assertEqual(exp.result[0][0], 0.5)
+        self.assertEqual(exp.result[0][1], 1.0)
+
+    def test_experiment_with_list(self):
+        # TODO!!!
         pass
 
+    def test_random_discretized_projections(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
