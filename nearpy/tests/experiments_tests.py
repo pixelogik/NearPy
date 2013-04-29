@@ -24,7 +24,8 @@ import numpy
 import unittest
 
 from nearpy.experiments import RecallPrecisionExperiment
-from nearpy.hashes import UniBucket, RandomDiscretizedProjections, RandomBinaryProjections
+from nearpy.hashes import UniBucket, RandomDiscretizedProjections, \
+    RandomBinaryProjections
 from nearpy.filters import NearestFilter, UniqueFilter
 from nearpy.distances import AngularDistance
 
@@ -143,7 +144,7 @@ class TestRecallExperiment(unittest.TestCase):
         vectors = numpy.random.randn(dim, vector_count)
 
         # First get recall and precision for one 1-dim random hash
-        rdp = RandomDiscretizedProjections('rdp', 1, 0.001)
+        rdp = RandomDiscretizedProjections('rdp', 1, 0.01)
         nearest = NearestFilter(10)
         engine = Engine(dim, lshashes=[rdp],
                         vector_filters=[nearest])
@@ -154,25 +155,39 @@ class TestRecallExperiment(unittest.TestCase):
         precision1 = result[0][1]
         searchtime1 = result[0][2]
 
-        print '\nRecall1: %f, Precision1: %f, SearchTime1: %f\n' % \
+        print '\nRecall RDP: %f, Precision RDP: %f, SearchTime RDP: %f\n' % \
             (recall1, precision1, searchtime1)
 
-        #rbp = RandomBinaryProjections('rbp', 1)
-
-        #engine = Engine(dim, lshashes=[rbp],
-        #               vector_filters=[nearest])
+        # Then get recall and precision for one 2-dim random hash
+        rdp = RandomDiscretizedProjections('rdp', 2, 0.1)
+        engine = Engine(dim, lshashes=[rdp],
+                        vector_filters=[nearest])
         result = exp.perform_experiment([engine])
 
-        recall1 = result[0][0]
-        precision1 = result[0][1]
-        searchtime1 = result[0][2]
+        recall2 = result[0][0]
+        precision2 = result[0][1]
+        searchtime2 = result[0][2]
 
-        print '\nRecall1: %f, Precision1: %f, SearchTime1: %f\n' % \
-            (recall1, precision1, searchtime1)
+        print '\nRecall RDP: %f, Precision RDP: %f, SearchTime RDP: %f\n' % \
+            (recall2, precision2, searchtime2)
 
-        # Both recall and precision must be one in this case
-#        self.assertEqual(exp.result[0][0], 1.0)
- #       self.assertEqual(exp.result[0][1], 1.0)
+        # Then get recall and precision for one 3-dim random hash
+        rdp = RandomDiscretizedProjections('rdp', 3, 0.3)
+        engine = Engine(dim, lshashes=[rdp],
+                        vector_filters=[nearest])
+        result = exp.perform_experiment([engine])
+
+        recall3 = result[0][0]
+        precision3 = result[0][1]
+        searchtime3 = result[0][2]
+
+        print '\nRecall RDP: %f, Precision RDP: %f, SearchTime RDP: %f\n' % \
+            (recall3, precision3, searchtime3)
+
+        # Many things are random here, but the precision should increase
+        # with dimension
+        self.assertTrue(precision2 > precision1)
+        self.assertTrue(precision3 > precision2)
 
 if __name__ == '__main__':
     unittest.main()
