@@ -91,7 +91,6 @@ class Engine(object):
         candidates = []
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v):
-                # TODO: Potential duplicates here with multiple hashes!
                 bucket_content = self.storage.get_bucket(lshash.hash_name,
                                                          bucket_key)
                 candidates.extend(bucket_content)
