@@ -57,7 +57,6 @@ class TestRandomDiscretizedProjections(unittest.TestCase):
         h = self.rbp.hash_vector(numpy.random.randn(100))
         self.assertEqual(len(h), 1)
         self.assertEqual(type(h[0]), type(''))
-        print h[0]
 
     def test_hash_deterministic(self):
         x = numpy.random.randn(100)
