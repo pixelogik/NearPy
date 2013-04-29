@@ -23,7 +23,9 @@
 import numpy
 import unittest
 
-from nearpy.hashes import RandomBinaryProjections, RandomDiscretizedProjections
+from nearpy.hashes import RandomBinaryProjections, \
+    RandomDiscretizedProjections, \
+    PCABinaryProjections
 
 
 class TestRandomBinaryProjections(unittest.TestCase):
@@ -63,6 +65,27 @@ class TestRandomDiscretizedProjections(unittest.TestCase):
         first_hash = self.rbp.hash_vector(x)[0]
         for k in range(100):
             self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
+
+
+class TestPCABinaryProjections(unittest.TestCase):
+
+    def setUp(self):
+        self.vectors = numpy.random.randn(10, 100)
+        self.pbp = PCABinaryProjections('pbp', 4, self.vectors)
+
+    def test_hash_format(self):
+        h = self.pbp.hash_vector(numpy.random.randn(10))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+        self.assertEqual(len(h[0]), 4)
+        for c in h[0]:
+            self.assertTrue(c == '1' or c == '0')
+
+    def test_hash_deterministic(self):
+        x = numpy.random.randn(10)
+        first_hash = self.pbp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.pbp.hash_vector(x)[0])
 
 
 if __name__ == '__main__':

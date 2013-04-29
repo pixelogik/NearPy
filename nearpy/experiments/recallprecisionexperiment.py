@@ -26,6 +26,8 @@ import time
 
 from scipy.spatial.distance import cdist
 
+from nearpy.utils import numpy_array_from_list_or_numpy_array
+
 
 class RecallPrecisionExperiment(object):
     """
@@ -56,24 +58,17 @@ class RecallPrecisionExperiment(object):
         # We need a dict from vector string representation to index
         self.vector_dict = {}
 
-        # If vectors is not a numpy matrix, create one
-        if not isinstance(vectors, numpy.ndarray):
-            V = numpy.zeros((vectors[0].shape[0], len(vectors)))
-            for index in range(len(vectors)):
-                vector = vectors[index]
-                V[:, index] = vector
-            vectors = V
+        # Get numpy array representation of input
+        self.vectors = numpy_array_from_list_or_numpy_array(vectors)
 
-        for index in range(vectors.shape[1]):
+        # Build map from vector string representation to vector
+        for index in range(self.vectors.shape[1]):
             self.vector_dict[self.__vector_to_string(
-                vectors[:, index])] = index
-
-        # Store vectors in object
-        self.vectors = vectors
+                self.vectors[:, index])] = index
 
         # Get transposed version of vector matrix, so that the rows
         # are the vectors (needed by cdist)
-        vectors_t = numpy.transpose(vectors)
+        vectors_t = numpy.transpose(self.vectors)
 
         # We have to time the exact search
         exact_search_start_time = time.time()

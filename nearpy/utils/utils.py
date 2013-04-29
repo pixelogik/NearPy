@@ -20,10 +20,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from hashes_tests import TestRandomBinaryProjections, \
-    TestRandomDiscretizedProjections, TestPCABinaryProjections
-from engine_tests import TestEngine
-from storage_tests import TestStorage
-from distances_tests import TestEuclideanDistance, TestAngularDistance
-from filters_tests import TestVectorFilters
-from experiments_tests import TestRecallExperiment
+import numpy
+
+
+def numpy_array_from_list_or_numpy_array(vectors):
+    """
+    Returns numpy array representation of argument.
+
+    Argument maybe numpy array (input is returned)
+    or a list of numpy vectors.
+    """
+    # If vectors is not a numpy matrix, create one
+    if not isinstance(vectors, numpy.ndarray):
+        V = numpy.zeros((vectors[0].shape[0], len(vectors)))
+        for index in range(len(vectors)):
+            vector = vectors[index]
+            V[:, index] = vector
+        return V
+
+    return vectors
+
+
+def perform_pca(A):
+    """
+    Computes eigenvalues and eigenvectors of covariance matrix of A.
+    The rows of a correspond to observations, the columns to variables.
+    """
+    # First subtract the mean
+    M = (A-numpy.mean(A.T, axis=1)).T
+    # Get eigenvectors and values of covariance matrix
+    return numpy.linalg.eig(numpy.cov(M))

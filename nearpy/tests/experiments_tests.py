@@ -25,7 +25,7 @@ import unittest
 
 from nearpy.experiments import RecallPrecisionExperiment
 from nearpy.hashes import UniBucket, RandomDiscretizedProjections, \
-    RandomBinaryProjections
+    RandomBinaryProjections, PCABinaryProjections
 from nearpy.filters import NearestFilter, UniqueFilter
 from nearpy.distances import AngularDistance
 
@@ -139,7 +139,7 @@ class TestRecallExperiment(unittest.TestCase):
         self.assertEqual(result[0][1], 1.0)
 
     def test_random_discretized_projections(self):
-        dim = 2
+        dim = 4
         vector_count = 5000
         vectors = numpy.random.randn(dim, vector_count)
 
@@ -158,8 +158,8 @@ class TestRecallExperiment(unittest.TestCase):
         print '\nRecall RDP: %f, Precision RDP: %f, SearchTime RDP: %f\n' % \
             (recall1, precision1, searchtime1)
 
-        # Then get recall and precision for one 2-dim random hash
-        rdp = RandomDiscretizedProjections('rdp', 2, 0.1)
+        # Then get recall and precision for one 4-dim random hash
+        rdp = RandomDiscretizedProjections('rdp', 2, 0.2)
         engine = Engine(dim, lshashes=[rdp],
                         vector_filters=[nearest])
         result = exp.perform_experiment([engine])
@@ -171,23 +171,29 @@ class TestRecallExperiment(unittest.TestCase):
         print '\nRecall RDP: %f, Precision RDP: %f, SearchTime RDP: %f\n' % \
             (recall2, precision2, searchtime2)
 
-        # Then get recall and precision for one 3-dim random hash
-        rdp = RandomDiscretizedProjections('rdp', 3, 0.3)
-        engine = Engine(dim, lshashes=[rdp],
-                        vector_filters=[nearest])
-        result = exp.perform_experiment([engine])
-
-        recall3 = result[0][0]
-        precision3 = result[0][1]
-        searchtime3 = result[0][2]
-
-        print '\nRecall RDP: %f, Precision RDP: %f, SearchTime RDP: %f\n' % \
-            (recall3, precision3, searchtime3)
-
         # Many things are random here, but the precision should increase
         # with dimension
         self.assertTrue(precision2 > precision1)
-        self.assertTrue(precision3 > precision2)
+
+    def test_random_binary_projections(self):
+        dim = 4
+        vector_count = 5000
+        vectors = numpy.random.randn(dim, vector_count)
+
+        # First get recall and precision for one 1-dim random hash
+        rbp = RandomBinaryProjections('rbp', 32)
+        nearest = NearestFilter(10)
+        engine = Engine(dim, lshashes=[rbp],
+                        vector_filters=[nearest])
+        exp = RecallPrecisionExperiment(10, vectors)
+        result = exp.perform_experiment([engine])
+
+        recall1 = result[0][0]
+        precision1 = result[0][1]
+        searchtime1 = result[0][2]
+
+        print '\nRecall RBP: %f, Precision RBP: %f, SearchTime RBP: %f\n' % \
+            (recall1, precision1, searchtime1)
 
 if __name__ == '__main__':
     unittest.main()
