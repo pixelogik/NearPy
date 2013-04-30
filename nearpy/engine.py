@@ -95,9 +95,6 @@ class Engine(object):
                                                          bucket_key)
                 candidates.extend(bucket_content)
 
-        if __debug__:
-            print 'Candidate count is %d' % len(candidates)
-
         # Apply distance implementation if specified
         if self.distance:
             candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x

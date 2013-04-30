@@ -40,8 +40,6 @@ class MemoryStorage(Storage):
         """
         Stores vector and JSON-serializable data in bucket with specified key.
         """
-        #print 'STORAGE: storing in hash %s with bucket key %s:' % (hash_name, bucket_key)
-        #print v
 
         if not hash_name in self.buckets:
             self.buckets[hash_name] = {}

@@ -44,9 +44,11 @@ class RecallPrecisionExperiment(object):
     too large if you don't want to wait too long for the result. Also
     the exact search computes a distance matrix that is quadratic in
     the data set size, so there are also memory limitations.
+
+    If specific, data must be a list unique keys, one for each vector.
     """
 
-    def __init__(self, N, vectors):
+    def __init__(self, N, vectors, data=None):
         """
         Performs exact nearest neighbour search on the data set.
 
@@ -57,6 +59,8 @@ class RecallPrecisionExperiment(object):
         self.N = N
         # We need a dict from vector string representation to index
         self.vector_dict = {}
+        # Store optional vector data
+        self.data = data
 
         # Get numpy array representation of input
         self.vectors = numpy_array_from_list_or_numpy_array(vectors)
@@ -80,8 +84,8 @@ class RecallPrecisionExperiment(object):
         # For each vector get the closest N neigbbours from distance matrix
         self.closest = []
         for index in range(D.shape[1]):
-            # This includes the vector itself, which is what we want
-            self.closest.append(scipy.argsort(D[:, index])[:N])
+            # Skip the first one, because it is the query vector itself
+            self.closest.append(scipy.argsort(D[:, index])[1:N+1])
 
         print '\Done with exact search...\n'
 
@@ -105,6 +109,9 @@ class RecallPrecisionExperiment(object):
 
         # For each engine, first index vectors and then retrieve neighbours
         for engine in engine_list:
+            print 'Engine %d / %d' % (engine_list.index(engine),
+                                      len(engine_list))
+
             # Clean storage
             engine.clean_all_buckets()
             # Use this to compute average recall
@@ -115,17 +122,19 @@ class RecallPrecisionExperiment(object):
             avg_search_time = 0.0
 
             # Index vectors and store them
-            for index in range(self.vectors.shape[1]):
-                #print 'Storing vector %d' % index
-                #print vectors[:, index]
-                engine.store_vector(self.vectors[:, index], 'testData')
+            if self.data:
+                for index in range(self.vectors.shape[1]):
+                    engine.store_vector(self.vectors[:, index],
+                                        self.data[index])
+            else:
+                for index in range(self.vectors.shape[1]):
+                    engine.store_vector(self.vectors[:, index],
+                                        'data_%d' % index)
 
             # Look for N nearest neighbours
             for index in range(self.vectors.shape[1]):
                 # Get indices of the real nearest as set
                 real_nearest = set(self.closest[index])
-                #print 'Real nearest for %d:' % index
-                #print real_nearest
 
                 # We have to time the search
                 search_time_start = time.time()
@@ -136,22 +145,29 @@ class RecallPrecisionExperiment(object):
                 # Get search time
                 search_time = time.time() - search_time_start
 
-                #print 'Nearest according to engine (len=%d):' % len(nearest)
-                #print [x[0] for x in nearest]
-
                 # For comparance we need their indices (as set)
                 nearest = set([self.__index_of_vector(x[0]) for x in nearest])
 
-                # Get intersection count
-                inter_count = float(len(real_nearest.intersection(nearest)))
+                # Remove query index from search result to make sure that
+                # recall and precision make sense in terms of "neighbours".
+                # If ONLY the query vector is retrieved, we want recall to be
+                # zero!
+                nearest.remove(index)
 
-                # Normalize recall for this vector
-                recall = inter_count/float(len(real_nearest))
-                #print 'Recall = %f' % recall
+                # If the result list is empty, recall and precision are 0.0
+                if len(nearest) == 0:
+                    recall = 0.0
+                    precision = 0.0
+                else:
+                    # Get intersection count
+                    inter_count = float(len(real_nearest.intersection(
+                        nearest)))
 
-                # Normalize precision for this vector
-                precision = inter_count/float(len(nearest))
-                #print 'Precision = %f' % precision
+                    # Normalize recall for this vector
+                    recall = inter_count/float(len(real_nearest))
+
+                    # Normalize precision for this vector
+                    precision = inter_count/float(len(nearest))
 
                 # Add to accumulator
                 avg_recall += recall
@@ -174,8 +190,6 @@ class RecallPrecisionExperiment(object):
             # Normalize search time with respect to exact search
             avg_search_time /= self.exact_search_time_per_vector
 
-            #print '\n AVG RECALL = %f\n' % avg_recall
-            #print '\n AVG PRECISION = %f\n' % avg_precision
             result.append((avg_recall, avg_precision, avg_search_time))
 
         # Return (recall, precision, search_time) tuple

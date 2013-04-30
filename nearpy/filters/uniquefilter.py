@@ -30,6 +30,9 @@ class UniqueFilter(VectorFilter):
     Makes sure that each vectors is only once in the vector list. Works on
     both types of vector listst - (vector, data, distance) and
     (vector, data).
+
+    This filter uses the 'data' as key for uniqueness. If you need some
+    other feature for uniqueness, you can implement your own filter.
     """
 
     def __init__(self):
@@ -41,5 +44,5 @@ class UniqueFilter(VectorFilter):
         """
         unique_dict = {}
         for v in input_list:
-            unique_dict[numpy.array_str(v[0])] = v
+            unique_dict[v[1]] = v
         return unique_dict.values()

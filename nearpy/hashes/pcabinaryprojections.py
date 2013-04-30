@@ -64,9 +64,6 @@ class PCABinaryProjections(LSHash):
         largest_eigenvalue_indices = numpy.flipud(
             scipy.argsort(eigenvalues))[:projection_count]
 
-        #print eigenvalues
-        #print largest_eigenvalue_indices
-
         # Create matrix for first N principal components
         self.components = numpy.zeros((self.dim,
                                        len(largest_eigenvalue_indices)))
@@ -78,8 +75,6 @@ class PCABinaryProjections(LSHash):
 
         # We need the component vectors to be in the rows
         self.components = numpy.transpose(self.components)
-
-        #print self.components
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
