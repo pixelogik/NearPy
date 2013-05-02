@@ -6,6 +6,8 @@ NearPy is a Python framework for fast (approximated) nearest neighbour search in
 
 It allows to experiment and to evaluate new methods but is also production-ready. It comes with a redis storage adapter.
 
+To install simply do *pip install NearPy*. It will also install the packages scipy, numpy and redis.
+
 Example usage:
 
     from nearpy import Engine
