@@ -4,8 +4,7 @@ NearPy
 
 NearPy is a Python framework for fast (approximated) nearest neighbour search in high dimensional vector spaces using different locality-sensitive hashing methods.
 
-It allows to experiment and to evaluate new methods but is also production-ready. It comes with a redis
-storage adapter.
+It allows to experiment and to evaluate new methods but is also production-ready. It comes with a redis storage adapter.
 
 Example usage:
 
