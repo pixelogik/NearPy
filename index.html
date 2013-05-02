@@ -1,0 +1,311 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Signika+Negative:300,400,600,700' rel='stylesheet' type='text/css'>
+    <link href="styles/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="styles/bootstrap-responsive.css" rel="stylesheet">
+    <link href='styles/main.css' rel='stylesheet' type='text/css'>
+
+
+    <title>NearPy - ANN in Python</title>
+
+</head>
+
+<body>
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="js/bootstrap.js"></script>
+
+    <div class="container-fluid">
+
+        <div class="row-fluid" style="padding-top:60px;padding-bottom:0px;">
+            <div class="span10">
+                <p>
+                    <b>NEARPY</b> - <a class="dark" href="#pipeline">PIPELINE</a> - <a class="dark" href="#usage">USAGE</a>
+                    - <a class="dark" href="#experiments">EXPERIMENTS</a> - <a class="dark" href="#storage">STORAGE</a>
+                </p>
+            </div>
+            <div class="span2">
+                <p style="margin-left:60px;">
+                    <a class="dark" href="https://github.com/pixelogik/NearPy">
+                        <button class="btn btn-primary" type="button">GitHub</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div class="row-fluid">
+            <div class="span12">
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row-fluid" style="padding-bottom:50px;padding-top:20px;">
+            <div class="span4" style="text-align:center;">
+                <img src="images/neigbours.png"/>
+            </div>
+            <div class="span8" style="margin-top:40px;">
+                <h1><span style='color:#0044FE;'>Near</span>Py</h1>
+                <br/>
+                <p style="margin-top:30px;color:#0044FE;font-weight:bold;">ANN search in large, high-dimensional data sets (in python)</p>
+            </div>
+        </div>
+
+        <div class="row-fluid" stlye="padding-bottom:50px;padding-top:50px;">
+            <div class="span12">
+
+                <h2>What is NearPy?</h2>
+                <p>
+                    NearPy is a simple yet modular little framework for ANN search written in the very popular programming language Python. It uses the also very popular Python frameworks numpy and scipy, which provide functionalities for scientific computing.
+                </p>
+
+                <h2>What is ANN?</h2>
+                <p>
+                    In many pattern matching applications, like <a href="http://en.wikipedia.org/wiki/Image_retrieval">image retrieval</a>, <a href="http://en.wikipedia.org/wiki/Multimedia_search#Query_by_Example">audio search</a> or <a href="http://en.wikipedia.org/wiki/Text_mining">text mining</a>, the feature space is high-dimensional and the database contains millions of items. When looking for items similar to a query, it is not feasible to compare it to the whole data set. This is where <a href="http://en.wikipedia.org/wiki/Nearest_neighbor_search#Approximate_nearest_neighbor">Approximated Nearest Neighbour</a> methods and especially <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing">locality-sensitive hashes</a> come in handy.
+                </p>
+
+                <h2>Why another framework?</h2>
+                <p>
+                    At <a href="http://1kdims.com">1kdims</a> we are experimenting with search technologies for different types of data and recently had a real need for a framework to fine-tune and evaluate ANN methods.
+                </p>
+
+            </div>
+        </div>
+
+        <div class="row-fluid" style="padding-top:20px;">
+            <div class="span12">
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row-fluid" stlye="padding-bottom:50px;">
+            <div class="span12">
+
+                <a name="pipeline"></a>
+                <h2>The Pipeline</h2>
+                <p>
+                    NearPy indexes and searches vectors using a modular pipeline, the <b>Engine</b>, build from four different kind of objects.
+                </p>
+                <p style="padding-top:10px;">
+                    <img src="images/Pipeline.png" />
+                </p>
+
+                <h3>Hashes</h3>
+                <p>
+                    Given a single vector as input, hashes generate one or more <b>bucket keys</b> from it. During indexing, the vector is then stored in one
+                    specific bucket for each key. During search, the neighbour candidates are collected from all these buckets. Hashes should in general be locality-sensitive, thus
+                    preserving the spatial structure to some degree. Close vectors should be put in the same buckets. The pipeline can use one or multiple hashes at the same time.
+                </p>
+
+                <h3>Storage</h3>
+                <p>
+                    Storage adapters store and return bucket contents. There are currently adapters for in-memory and <a href="http://redis.io/">redis</a>.
+                </p>
+
+                <h3>Distance</h3>
+                <p>
+                    After candidates have been collected from all the matching buckets in storage, the distance to the query vector is computed for all of them. Which <b>distance measure</b> is used is up to you.
+                    There are currently two distances available (euclidian and angular), but you can simply implement your own to customize what "near" means in your application. If your application
+                    does not need a distance measure because the locality-sensitivity of the hashes is enough, you can set <i>distance=None</i> in the engine constructor.
+                </p>
+
+                <h3>Filter</h3>
+                <p>
+                    The last step in the pipeline is an optional <b>filter chain</b>. These filters get lists of (vector, data) or (vector, data, distance) tupels, depending on the existence of a distance in the pipeline.
+                    They return lists of the same kind but mostly subsets of the input. What these filters actually do, is up to the implementation. NearPy brings three commonly used filters, <i>NearestFilter</i>,
+                    <i>DistanceThresholdFilter</i> and <i>UniqueFilter</i>.
+                </p>
+
+            </div>
+        </div>
+
+        <div class="row-fluid" style="padding-top:20px;">
+            <div class="span12">
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row-fluid" stlye="padding-bottom:50px;">
+            <div class="span12">
+
+                <a name="experiments"></a>
+                <h2>Experiments</h2>
+                <p>
+                    NearPy brings two classes for experiments. <i>RecallPrecisionExperiment</i> and <i>DistanceRatioExperiment</i>. They allow to evaluate different engine
+                    configurations, hashes, distances and filters on a custom data set.
+                </p>
+
+                <h3>Distance Ratio</h3>
+                <p>
+                    We found out that recall and precision are no good measures when it comes to ANN, because they focus on the actual vectors in the result set. In ANN we are more interested in the preservation of spatial structure. So in our eyes a much better measure is the <b>distance ratio</b>. We do not know if this has been used before, but we find it to be a really good measure to determine how a certain ANN method performs on a given data set.
+                </p>
+
+                <p>
+                    <b>
+                    The distance ratio is the average distance between the query vector and those approximated nearest neighbours (ANNs) that lie outside of the exact nearest neighbour area for a given N, normalized with respect to this area's radius R.
+                    </b>
+                </p>
+
+                <p>
+                    This means, that if the distance ratio is 0.0, all ANNs are within the original neighbour radius. A ratio of 1.0 means the average ANN is 2*R away from the query vector.
+                </p>
+
+                <p>
+                    <img src="images/distance-ratio-explained.png" />
+
+                </p>
+
+                <h3>Example</h3>
+                <p>
+                    These three plots are the result of one experiment with random data (dim=100, count=10000) and N=10. Experiments return distance ratio, result size and search time (with respect to exact search time)
+                    for each engine configuration in the experiment. In this experiment four random discretized 1-dim projection hashes were used with varying bin widths.
+                </p>
+
+                <p>
+
+                    <table>
+                        <tr>
+                            <td>
+                                <a href="images/distance_ratios.png">
+                                    <img src="images/distance_ratios.png" width="350"/>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="images/result_sizes.png">
+                                    <img src="images/result_sizes.png" width="350"/>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="images/times.png">
+                                    <img src="images/times.png" width="350"/>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </p>
+
+                <p>
+                    From the plots one can see, that with increasing bin width, search time and size of the result list increase. This is simply the case, because the larger the bin, the more
+                    vectors are contained in each bin. At the same time, the distance ratio decreases, because more vectors in each bin mean more close neighbours of the query vector. So in this particular case, with a search time of only 10% compared to the exact search, the average ANN is
+                    only 9% outside of the exact neighbour radius (N=10), which is not bad for a first shot.
+                </p>
+
+
+                <p style="padding-top:20px;">
+                    Download the source code for this experiment <a href="examples/experiment1.py">here</a>.
+                </p>
+
+            </div>
+        </div>
+
+        <div class="row-fluid" style="padding-top:20px;">
+            <div class="span12">
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row-fluid" stlye="padding-bottom:50px;">
+            <div class="span12">
+
+                <a name="usage"></a>
+                <h2>Example Usage</h2>
+                <p style="padding-top:20px;">
+
+                    <pre>
+import numpy
+
+from nearpy import Engine
+from nearpy.hashes import RandomBinaryProjections
+
+# Dimension of our vector space
+dimension = 500
+
+# Create a random binary hash with 10 bits
+rbp = RandomBinaryProjections('rbp', 10)
+
+# Create engine with pipeline configuration
+engine = Engine(dimension, lshashes=[rbp])
+
+# Index 1000000 random vectors (set their data to a unique string)
+for index in range(100000):
+    v = numpy.random.randn(dimension)
+    engine.store_vector(v, 'data_%d' % index)
+
+# Create random query vector
+query = numpy.random.randn(dimension)
+
+# Get nearest neighbours
+N = engine.neighbours(query)
+                    </pre>
+
+
+
+                </p>
+
+            </div>
+        </div>
+
+        <div class="row-fluid" style="padding-top:20px;">
+            <div class="span12">
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row-fluid" stlye="padding-bottom:50px;">
+            <div class="span12">
+
+                <a name="storage"></a>
+                <h2>Storage</h2>
+                <p>
+                    The default storage is in-memory, realized by simple Python structures. To use instead the <b>redis</b> adapter, do this:
+                </p>
+                <p style="padding-top:20px;">
+                    <pre>
+from redis import Redis
+from nearpy.storage import RedisStorage
+
+redis_storage = RedisStorage(redis.Redis(host='localhost', port=6379, db=0))
+engine = Engine(dimension, lshashes=[myHash1],
+                vector_filters=[myFilter1, myFilter2], storage=redis_storage)
+                    </pre>
+                </p>
+
+            </div>
+        </div>
+
+
+
+
+        <div class="row-fluid" style="padding-top:20px;">
+            <div class="span12">
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row-fluid" stlye="padding-bottom:50px;">
+            <div class="span12">
+                © Copyright 2013 Ole Krause-Sparmann - Visit us at <a href="http://1kdims.com">1kdims.com</a>. We love apps and data science.
+            </div>
+        </div>
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+
+    </div>
+
+
+</body>
+
+</html>
