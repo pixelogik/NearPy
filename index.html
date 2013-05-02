@@ -103,7 +103,7 @@
                 <a name="pipeline"></a>
                 <h2>The Pipeline</h2>
                 <p>
-                    NearPy indexes and searches vectors using a modular pipeline, the <b>Engine</b>, build from four different kind of objects.
+                    NearPy indexes and searches vectors using a modular pipeline, the <b>Engine</b>, build from four different kinds of objects.
                 </p>
                 <p style="padding-top:10px;">
                     <img src="images/Pipeline.png" />
@@ -124,7 +124,7 @@
                 <h3>Distance</h3>
                 <p>
                     After candidates have been collected from all the matching buckets in storage, the distance to the query vector is computed for all of them. Which <b>distance measure</b> is used is up to you.
-                    There are currently two distances available (euclidian and angular), but you can simply implement your own to customize what "near" means in your application. If your application
+                    There are currently two distances available (euclidean and angular), but you can simply implement your own to customize what "near" means in your application. If your application
                     does not need a distance measure because the locality-sensitivity of the hashes is enough, you can set <i>distance=None</i> in the engine constructor.
                 </p>
 
