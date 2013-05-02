@@ -30,14 +30,14 @@ class TestVectorFilters(unittest.TestCase):
 
     def setUp(self):
         self.V = []
-        self.V.append((numpy.array([0]), 'data', 0.4))
-        self.V.append((numpy.array([1]), 'data', 0.9))
-        self.V.append((numpy.array([2]), 'data', 1.4))
-        self.V.append((numpy.array([3]), 'data', 2.1))
-        self.V.append((numpy.array([4]), 'data', 0.1))
-        self.V.append((numpy.array([5]), 'data', 8.7))
-        self.V.append((numpy.array([6]), 'data', 3.4))
-        self.V.append((numpy.array([7]), 'data', 2.8))
+        self.V.append((numpy.array([0]), 'data1', 0.4))
+        self.V.append((numpy.array([1]), 'data2', 0.9))
+        self.V.append((numpy.array([2]), 'data3', 1.4))
+        self.V.append((numpy.array([3]), 'data4', 2.1))
+        self.V.append((numpy.array([4]), 'data5', 0.1))
+        self.V.append((numpy.array([5]), 'data6', 8.7))
+        self.V.append((numpy.array([6]), 'data7', 3.4))
+        self.V.append((numpy.array([7]), 'data8', 2.8))
 
         self.threshold_filter = DistanceThresholdFilter(1.0)
         self.nearest_filter = NearestFilter(5)
@@ -61,10 +61,10 @@ class TestVectorFilters(unittest.TestCase):
 
     def test_unique(self):
         W = self.V
-        W.append((numpy.array([7]), 'data', 2.8))
-        W.append((numpy.array([0]), 'data', 2.8))
-        W.append((numpy.array([1]), 'data', 2.8))
-        W.append((numpy.array([6]), 'data', 2.8))
+        W.append((numpy.array([7]), 'data8', 2.8))
+        W.append((numpy.array([0]), 'data1', 2.8))
+        W.append((numpy.array([1]), 'data2', 2.8))
+        W.append((numpy.array([6]), 'data7', 2.8))
 
         result = self.unique.filter_vectors(W)
         self.assertEqual(len(result), 8)

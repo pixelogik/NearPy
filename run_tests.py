@@ -4,17 +4,8 @@ import unittest
 import nearpy.tests as tests
 
 suite = unittest.TestLoader().loadTestsFromTestCase(
-    tests.TestPCABinaryProjections)
+    tests.TestStorage)
 unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-suite = unittest.TestLoader().loadTestsFromTestCase(
-    tests.TestRecallExperiment)
-unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-
-exit()
 
 suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestRandomBinaryProjections)
@@ -29,10 +20,6 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
 unittest.TextTestRunner(verbosity=2).run(suite)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(
-    tests.TestStorage)
-unittest.TextTestRunner(verbosity=2).run(suite)
-
-suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestEuclideanDistance)
 unittest.TextTestRunner(verbosity=2).run(suite)
 
@@ -44,3 +31,11 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestVectorFilters)
 unittest.TextTestRunner(verbosity=2).run(suite)
 
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestPCABinaryProjections)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
+# TODO: Experiment tests are out of date!
+#suite = unittest.TestLoader().loadTestsFromTestCase(
+#    tests.TestRecallExperiment)
+#unittest.TextTestRunner(verbosity=2).run(suite)

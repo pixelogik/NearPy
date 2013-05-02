@@ -22,3 +22,4 @@
 
 from storage import Storage
 from storage_memory import MemoryStorage
+from storage_redis import RedisStorage

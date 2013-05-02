@@ -58,5 +58,5 @@ class RandomDiscretizedProjections(LSHash):
         # Project vector onto all hyperplane normals
         projection = numpy.dot(self.vectors, v)
         projection = numpy.floor(projection / self.bin_width)
-        # Return binary key
+        # Return key
         return ['_'.join([str(int(x)) for x in projection])]

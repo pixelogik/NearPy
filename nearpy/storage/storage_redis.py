@@ -28,6 +28,8 @@
 # THE SOFTWARE.
 
 import redis
+import json
+import numpy
 
 from storage import Storage
 
@@ -44,23 +46,45 @@ class RedisStorage(Storage):
         Stores vector and JSON-serializable data in bucket with specified key.
         """
         redis_key = 'nearpy_%s_%s' % (hash_name, bucket_key)
-        self.redis_object.rpush(redis_key, (v, data))
+
+        # Make sure it is a 1d vector
+        v = numpy.reshape(v, v.shape[0])
+
+        val_dict = {'vector': v.tolist()}
+        if data:
+            val_dict['data'] = data
+
+        self.redis_object.rpush(redis_key, json.dumps(val_dict))
 
     def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
         """
         redis_key = 'nearpy_%s_%s' % (hash_name, bucket_key)
-        return self.redis_object.lrange(0, -1)
+        items = self.redis_object.lrange(redis_key, 0, -1)
+        results = []
+        for item_str in items:
+            val_dict = json.loads(item_str)
+            vector = numpy.fromiter(val_dict['vector'], dtype=numpy.float64)
+            if 'data' in val_dict:
+                results.append((vector, val_dict['data']))
+            else:
+                results.append((vector, None))
+
+        return results
 
     def clean_buckets(self, hash_name):
         """
         Removes all buckets and their content for specified hash.
         """
-        self.buckets[hash_name] = {}
+        bucket_keys = self.redis_object.keys(pattern='nearpy_%s_*' % hash_name)
+        for bucket_key in bucket_keys:
+            self.redis_object.delete(bucket_key)
 
     def clean_all_buckets(self):
         """
         Removes all buckets from all hashes and their content.
         """
-        self.buckets = {}
+        bucket_keys = self.redis_object.keys(pattern='nearpy_*')
+        for bucket_key in bucket_keys:
+            self.redis_object.delete(bucket_key)

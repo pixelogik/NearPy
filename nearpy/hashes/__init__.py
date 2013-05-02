@@ -24,4 +24,5 @@ from lshash import LSHash
 from randombinaryprojections import RandomBinaryProjections
 from randomdiscretizedprojections import RandomDiscretizedProjections
 from pcabinaryprojections import PCABinaryProjections
+from pcadiscretizedprojections import PCADiscretizedProjections
 from unibucket import UniBucket

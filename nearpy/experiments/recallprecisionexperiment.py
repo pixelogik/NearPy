@@ -23,6 +23,7 @@
 import numpy
 import scipy
 import time
+import sys
 
 from scipy.spatial.distance import cdist
 
@@ -35,20 +36,20 @@ class RecallPrecisionExperiment(object):
     for all engines in the specified list.
 
     perform_experiment() returns list of (recall, precision, search_time)
-    tuple. All are the averaged values over all request vectors. search_time
+    tuple. These are the averaged values over all request vectors. search_time
     is the average retrieval/search time compared to the average exact search
     time.
 
-    Because this experiment performs an exact search to first determine the
-    real N nearest neighbours for each vector, the data set should not be
-    too large if you don't want to wait too long for the result. Also
-    the exact search computes a distance matrix that is quadratic in
-    the data set size, so there are also memory limitations.
-
-    If specific, data must be a list unique keys, one for each vector.
+    coverage_ratio determines how many of the vectors are used as query
+    vectors for exact andapproximated search. Because the search comparance
+    overhead is quite large, it is best with large data sets (>10000) to
+    use a low coverage_ratio (like 0.1) to make the experiment fast. A
+    coverage_ratio of 0.1 makes the experiment use 10% of all the vectors
+    for querying, that is, it looks for 10% of all vectors for the nearest
+    neighbours.
     """
 
-    def __init__(self, N, vectors, data=None):
+    def __init__(self, N, vectors, coverage_ratio=0.2):
         """
         Performs exact nearest neighbour search on the data set.
 
@@ -56,11 +57,10 @@ class RecallPrecisionExperiment(object):
         as columns OR a python array containing the individual
         numpy vectors.
         """
-        self.N = N
         # We need a dict from vector string representation to index
         self.vector_dict = {}
-        # Store optional vector data
-        self.data = data
+        self.N = N
+        self.coverage_ratio = coverage_ratio
 
         # Get numpy array representation of input
         self.vectors = numpy_array_from_list_or_numpy_array(vectors)
@@ -74,25 +74,37 @@ class RecallPrecisionExperiment(object):
         # are the vectors (needed by cdist)
         vectors_t = numpy.transpose(self.vectors)
 
-        # We have to time the exact search
-        exact_search_start_time = time.time()
+        # Determine the indices of query vectors used for comparance
+        # with approximated search.
+        query_count = numpy.floor(self.coverage_ratio *
+                                  self.vectors.shape[1])
+        self.query_indices = []
+        for k in range(int(query_count)):
+            index = numpy.floor(k*(self.vectors.shape[1]/query_count))
+            index = min(index, self.vectors.shape[1]-1)
+            self.query_indices.append(int(index))
 
-        print '\nStarting exact search...\n'
-        # Compute distance matrix
-        D = cdist(vectors_t, vectors_t, 'euclidean')
+        print '\nStarting exact search (query set size=%d)...\n' % query_count
 
-        # For each vector get the closest N neigbbours from distance matrix
-        self.closest = []
-        for index in range(D.shape[1]):
-            # Skip the first one, because it is the query vector itself
-            self.closest.append(scipy.argsort(D[:, index])[1:N+1])
+        # For each query vector get the closest N neighbours
+        self.closest = {}
+        self.exact_search_time_per_vector = 0.0
+
+        for index in self.query_indices:
+
+            v = vectors_t[index, :].reshape(1, self.vectors.shape[0])
+            exact_search_start_time = time.time()
+            D = cdist(v, vectors_t, 'euclidean')
+            self.closest[index] = scipy.argsort(D)[0, 1:N+1]
+
+            # Save time needed for exact search
+            exact_search_time = time.time() - exact_search_start_time
+            self.exact_search_time_per_vector += exact_search_time
 
         print '\Done with exact search...\n'
 
-        # Save time needed for exact search
-        exact_search_time = time.time() - exact_search_start_time
-        # We are interested in the search time per vector
-        self.exact_search_time_per_vector = exact_search_time / D.shape[1]
+        # Normalize search time
+        self.exact_search_time_per_vector /= float(len(self.query_indices))
 
     def perform_experiment(self, engine_list):
         """
@@ -121,18 +133,13 @@ class RecallPrecisionExperiment(object):
             # Use this to compute average search time
             avg_search_time = 0.0
 
-            # Index vectors and store them
-            if self.data:
-                for index in range(self.vectors.shape[1]):
-                    engine.store_vector(self.vectors[:, index],
-                                        self.data[index])
-            else:
-                for index in range(self.vectors.shape[1]):
-                    engine.store_vector(self.vectors[:, index],
-                                        'data_%d' % index)
-
-            # Look for N nearest neighbours
+            # Index all vectors and store them
             for index in range(self.vectors.shape[1]):
+                engine.store_vector(self.vectors[:, index],
+                                    'data_%d' % index)
+
+            # Look for N nearest neighbours for query vectors
+            for index in self.query_indices:
                 # Get indices of the real nearest as set
                 real_nearest = set(self.closest[index])
 
@@ -178,17 +185,21 @@ class RecallPrecisionExperiment(object):
                 # Add to accumulator
                 avg_search_time += search_time
 
-            # Normalize recall over data set
-            avg_recall = avg_recall / float(self.vectors.shape[1])
+            # Normalize recall over query set
+            avg_recall = avg_recall / float(len(self.query_indices))
 
-            # Normalize precision over data set
-            avg_precision = avg_precision / float(self.vectors.shape[1])
+            # Normalize precision over query set
+            avg_precision = avg_precision / float(len(self.query_indices))
 
-            # Normalize search time over data set
-            avg_search_time = avg_search_time / float(self.vectors.shape[1])
+            # Normalize search time over query set
+            avg_search_time = avg_search_time / float(len(self.query_indices))
 
             # Normalize search time with respect to exact search
             avg_search_time /= self.exact_search_time_per_vector
+
+            print '  recall=%f, precision=%f, time=%f' % (avg_recall,
+                                                          avg_precision,
+                                                          avg_search_time)
 
             result.append((avg_recall, avg_precision, avg_search_time))
 

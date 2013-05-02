@@ -21,3 +21,4 @@
 # THE SOFTWARE.
 
 from recallprecisionexperiment import RecallPrecisionExperiment
+from distanceratioexperiment import DistanceRatioExperiment
