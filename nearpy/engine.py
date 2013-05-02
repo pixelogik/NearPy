@@ -22,10 +22,10 @@
 
 import json
 
-from hashes import RandomBinaryProjections
-from filters import NearestFilter
-from distances import EuclideanDistance
-from storage import MemoryStorage
+from nearpy.hashes import RandomBinaryProjections
+from nearpy.filters import NearestFilter
+from nearpy.distances import EuclideanDistance
+from nearpy.storage import MemoryStorage
 
 
 class Engine(object):

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from vectorfilter import VectorFilter
+from nearpy.filters.vectorfilter import VectorFilter
 
 
 class NearestFilter(VectorFilter):

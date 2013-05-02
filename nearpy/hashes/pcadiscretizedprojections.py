@@ -23,7 +23,7 @@
 import numpy
 import scipy
 
-from lshash import LSHash
+from nearpy.hashes.lshash import LSHash
 
 from nearpy.utils import numpy_array_from_list_or_numpy_array, perform_pca
 

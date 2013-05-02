@@ -31,7 +31,7 @@ import redis
 import json
 import numpy
 
-from storage import Storage
+from nearpy.storage.storage import Storage
 
 
 class RedisStorage(Storage):

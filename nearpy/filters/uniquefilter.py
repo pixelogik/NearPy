@@ -22,7 +22,7 @@
 
 import numpy
 
-from vectorfilter import VectorFilter
+from nearpy.filters.vectorfilter import VectorFilter
 
 
 class UniqueFilter(VectorFilter):

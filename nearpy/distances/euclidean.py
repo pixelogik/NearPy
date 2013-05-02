@@ -22,7 +22,7 @@
 
 import numpy
 
-from distance import Distance
+from nearpy.distances.distance import Distance
 
 
 class EuclideanDistance(Distance):

@@ -22,7 +22,7 @@
 
 import numpy
 
-from lshash import LSHash
+from nearpy.hashes.lshash import LSHash
 
 
 class RandomBinaryProjections(LSHash):
