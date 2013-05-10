@@ -221,8 +221,11 @@ N = engine.neighbours(query)
                     This means, that if the average distance ratio is 0.0, all ANNs are within the exact neighbour hypersphere. A ratio of 1.0 means the average ANN is 2*R away from the query vector.
                 </p>
 
+                <p>
+                    <a href="javascript:$('#distanceRatio').toggle();">Show / Hide formal definition of distance ratios</a>
+                </p>
 
-                <p style="background-color:#C0EDFE;border: 1px solid #00BAFB;margin-top:1.6em;padding:1.6em;" id="distanceRatio">
+                <p style="display:none;background-color:#C0EDFE;border: 1px solid #00BAFB;margin-top:1.6em;padding:1.6em;" id="distanceRatio">
 
                     Every vector x has N exact nearest neighbours n delivered by the exact search method theta:
 
