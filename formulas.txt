@@ -1,0 +1,11 @@
+\vartheta  : (\overrightarrow{x}, N) \rightarrow \{\overrightarrow{n_1}, ..., \overrightarrow{n_N}\}
+
+\alpha: (\overrightarrow{x}, N) \rightarrow \{ \alpha_1(\overrightarrow{x}), ..., \alpha_N(\overrightarrow{x}) \}
+
+R_N(\overrightarrow{x}) = max_{k=[1,...,N]} \left \| \overrightarrow{x} - \overrightarrow{n_k} \right \|
+
+d_N(\overrightarrow{y}, \overrightarrow{x}) = max \left ( 0, \frac{ \left \| \overrightarrow{x} - \overrightarrow{y} \right \| - R_N(\overrightarrow{x})}{R_N(\overrightarrow{x})}   \right )
+
+\Delta_N(\overrightarrow{x}, \alpha ) = \frac{1}{N} \sum_{i=1}^N d_N(\alpha_i(\overrightarrow{x}), \overrightarrow{x})
+
+D_N(X, \alpha) = \frac{1}{M} \sum_{j=1}^M \Delta_N(\overrightarrow{x_j}, \alpha)
