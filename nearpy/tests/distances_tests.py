@@ -27,8 +27,10 @@ from nearpy.distances import EuclideanDistance, AngularDistance
 
 ########################################################################
 
-
 # Helper functions
+
+def equal_with_tolerance(x, y, tolerance):
+    return x > (y-tolerance) and x < (y+tolerance)
 
 def test_distance_symmetry(test_obj, distance):
     for k in range(100):
@@ -36,8 +38,9 @@ def test_distance_symmetry(test_obj, distance):
         y = numpy.random.randn(10)
         d_xy = distance.distance(x, y)
         d_yx = distance.distance(y, x)
-        test_obj.assertTrue(d_xy == d_yx)
 
+        # I had precision issues with a local install. This test is more tolerant to that.
+        test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.000000000000001))
 
 def test_distance_triangle_inequality(test_obj, distance):
     for k in range(100):
