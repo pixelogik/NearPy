@@ -19,5 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import absolute_import
 
-from utils import numpy_array_from_list_or_numpy_array, perform_pca
+from nearpy.utils.utils import numpy_array_from_list_or_numpy_array, perform_pca

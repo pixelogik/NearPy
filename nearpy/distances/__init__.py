@@ -19,7 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import absolute_import
 
-from distance import Distance
-from angular import AngularDistance
-from euclidean import EuclideanDistance
+from nearpy.distances.distance import Distance
+from nearpy.distances.angular import AngularDistance
+from nearpy.distances.euclidean import EuclideanDistance

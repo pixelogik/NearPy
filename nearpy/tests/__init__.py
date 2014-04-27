@@ -19,11 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import absolute_import
 
-from hashes_tests import TestRandomBinaryProjections, \
+from nearpy.tests.hashes_tests import TestRandomBinaryProjections, \
     TestRandomDiscretizedProjections, TestPCABinaryProjections
-from engine_tests import TestEngine
-from storage_tests import TestStorage
-from distances_tests import TestEuclideanDistance, TestAngularDistance
-from filters_tests import TestVectorFilters
-from experiments_tests import TestRecallExperiment
+from nearpy.tests.engine_tests import TestEngine
+from nearpy.tests.storage_tests import TestStorage
+from nearpy.tests.distances_tests import TestEuclideanDistance, TestAngularDistance
+from nearpy.tests.filters_tests import TestVectorFilters
+from nearpy.tests.experiments_tests import TestRecallExperiment

@@ -19,8 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import absolute_import
 
-from vectorfilter import VectorFilter
-from distancethresholdfilter import DistanceThresholdFilter
-from nearestfilter import NearestFilter
-from uniquefilter import UniqueFilter
+from nearpy.filters.vectorfilter import VectorFilter
+from nearpy.filters.distancethresholdfilter import DistanceThresholdFilter
+from nearpy.filters.nearestfilter import NearestFilter
+from nearpy.filters.uniquefilter import UniqueFilter
