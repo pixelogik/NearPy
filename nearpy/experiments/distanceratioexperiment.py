@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import print_function
 
 import numpy
 import scipy
@@ -99,7 +100,7 @@ class DistanceRatioExperiment(object):
             index = min(index, self.vectors.shape[1]-1)
             self.query_indices.append(int(index))
 
-        print '\nStarting exact search (query set size=%d)...\n' % query_count
+        print('\nStarting exact search (query set size=%d)...\n' % query_count)
 
         # For each query vector get radius of closest N neighbours
         self.nearest_radius = {}
@@ -118,7 +119,7 @@ class DistanceRatioExperiment(object):
             exact_search_time = time.time() - exact_search_start_time
             self.exact_search_time_per_vector += exact_search_time
 
-        print '\Done with exact search...\n'
+        print('\Done with exact search...\n')
 
         # Normalize search time
         self.exact_search_time_per_vector /= float(len(self.query_indices))
@@ -138,8 +139,8 @@ class DistanceRatioExperiment(object):
 
         # For each engine, first index vectors and then retrieve neighbours
         for engine in engine_list:
-            print 'Engine %d / %d' % (engine_list.index(engine),
-                                      len(engine_list))
+            print('Engine %d / %d' % (engine_list.index(engine),
+                                      len(engine_list)))
 
             # Clean storage
             engine.clean_all_buckets()
@@ -204,9 +205,9 @@ class DistanceRatioExperiment(object):
             # Normalize search time with respect to exact search
             avg_search_time /= self.exact_search_time_per_vector
 
-            print '  distance_ratio=%f, result_size=%f, time=%f' % (avg_distance_ratio,
+            print('  distance_ratio=%f, result_size=%f, time=%f' % (avg_distance_ratio,
                                                                     avg_result_size,
-                                                                    avg_search_time)
+                                                                    avg_search_time))
 
             result.append((avg_distance_ratio, avg_result_size, avg_search_time))
 

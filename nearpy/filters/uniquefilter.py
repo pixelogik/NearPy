@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import print_function
 
 import numpy
 
@@ -48,4 +49,4 @@ class UniqueFilter(VectorFilter):
         unique_dict = {}
         for v in input_list:
             unique_dict[v[1]] = v
-        return unique_dict.values()
+        return list(unique_dict.values())
