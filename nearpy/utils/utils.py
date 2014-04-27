@@ -20,7 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import sys
 import numpy
+
 
 
 def numpy_array_from_list_or_numpy_array(vectors):
@@ -50,3 +52,18 @@ def perform_pca(A):
     M = (A-numpy.mean(A.T, axis=1)).T
     # Get eigenvectors and values of covariance matrix
     return numpy.linalg.eig(numpy.cov(M))
+
+
+PY2 = sys.version_info[0] == 2
+if PY2:
+    bytes_type = str
+else:
+    bytes_type = bytes
+
+
+def want_string(arg, encoding='utf-8'):
+    if isinstance(arg, bytes_type):
+        rv = arg.decode(encoding)
+    else:
+        rv = arg
+    return rv

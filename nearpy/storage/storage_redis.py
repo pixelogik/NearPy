@@ -32,6 +32,7 @@ import json
 import numpy
 
 from nearpy.storage.storage import Storage
+from nearpy.utils import want_string
 
 
 class RedisStorage(Storage):
@@ -64,7 +65,7 @@ class RedisStorage(Storage):
         items = self.redis_object.lrange(redis_key, 0, -1)
         results = []
         for item_str in items:
-            val_dict = json.loads(item_str)
+            val_dict = json.loads(want_string(item_str))
             vector = numpy.fromiter(val_dict['vector'], dtype=numpy.float64)
             if 'data' in val_dict:
                 results.append((vector, val_dict['data']))
