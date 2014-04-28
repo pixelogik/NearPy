@@ -19,7 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from __future__ import absolute_import
 
-from storage import Storage
-from storage_memory import MemoryStorage
-from storage_redis import RedisStorage
+from nearpy.storage.storage import Storage
+from nearpy.storage.storage_memory import MemoryStorage
+from nearpy.storage.storage_redis import RedisStorage
