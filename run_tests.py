@@ -24,7 +24,7 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
 unittest.TextTestRunner(verbosity=2).run(suite)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(
-    tests.TestAngularDistance)
+    tests.TestCosineDistance)
 unittest.TextTestRunner(verbosity=2).run(suite)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(

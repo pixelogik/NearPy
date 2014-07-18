@@ -23,7 +23,7 @@
 import numpy
 import unittest
 
-from nearpy.distances import EuclideanDistance, AngularDistance
+from nearpy.distances import EuclideanDistance, CosineDistance
 
 ########################################################################
 
@@ -69,13 +69,13 @@ class TestEuclideanDistance(unittest.TestCase):
         test_distance_symmetry(self, self.euclidean)
 
 
-class TestAngularDistance(unittest.TestCase):
+class TestCosineDistance(unittest.TestCase):
 
     def setUp(self):
-        self.angular = AngularDistance()
+        self.cosine = CosineDistance()
 
     def test_symmetry(self):
-        test_distance_symmetry(self, self.angular)
+        test_distance_symmetry(self, self.cosine)
 
 
 if __name__ == '__main__':

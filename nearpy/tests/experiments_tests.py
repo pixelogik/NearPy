@@ -28,7 +28,7 @@ from nearpy.experiments import RecallPrecisionExperiment
 from nearpy.hashes import UniBucket, RandomDiscretizedProjections, \
     RandomBinaryProjections, PCABinaryProjections
 from nearpy.filters import NearestFilter, UniqueFilter
-from nearpy.distances import AngularDistance
+from nearpy.distances import CosineDistance
 
 from nearpy import Engine
 

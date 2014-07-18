@@ -25,7 +25,7 @@ import numpy
 from nearpy.distances.distance import Distance
 
 
-class AngularDistance(Distance):
+class CosineDistance(Distance):
     """  Uses 1-cos(angle(x,y)) as distance measure. """
 
     def distance(self, x, y):
