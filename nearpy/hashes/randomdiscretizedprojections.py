@@ -32,7 +32,7 @@ class RandomDiscretizedProjections(LSHash):
     random vector using a bin width.
     """
 
-    def __init__(self, hash_name, projection_count, bin_width):
+    def __init__(self, hash_name, projection_count, bin_width, rand_seed=None):
         """
         Creates projection_count random vectors, that are used for projections.
         Each random vector will result in one discretized coordinate.
@@ -45,11 +45,12 @@ class RandomDiscretizedProjections(LSHash):
         self.dim = None
         self.vectors = None
         self.bin_width = bin_width
+	self.rand = numpy.random.RandomState(rand_seed)
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
         self.dim = dim
-        self.vectors = numpy.random.randn(self.projection_count, dim)
+        self.vectors = self.rand.randn(self.projection_count, dim)
 
     def hash_vector(self, v):
         """
