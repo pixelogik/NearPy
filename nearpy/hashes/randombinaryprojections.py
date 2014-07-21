@@ -34,7 +34,7 @@ class RandomBinaryProjections(LSHash):
     for storage.
     """
 
-    def __init__(self, hash_name, projection_count):
+    def __init__(self, hash_name, projection_count, rand_seed=None):
         """
         Creates projection_count random vectors, that are used for projections
         thus working as normals of random hyperplanes. Each random vector /
@@ -47,11 +47,12 @@ class RandomBinaryProjections(LSHash):
         self.projection_count = projection_count
         self.dim = None
         self.normals = None
+	self.rand = numpy.random.RandomState(rand_seed)
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
         self.dim = dim
-        self.normals = numpy.random.randn(self.projection_count, dim)
+        self.normals = self.rand.randn(self.projection_count, dim)
 
     def hash_vector(self, v):
         """
