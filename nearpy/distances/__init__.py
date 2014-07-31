@@ -24,3 +24,4 @@ from __future__ import absolute_import
 from nearpy.distances.distance import Distance
 from nearpy.distances.cosine import CosineDistance
 from nearpy.distances.euclidean import EuclideanDistance
+from nearpy.distances.manhattan import ManhattanDistance

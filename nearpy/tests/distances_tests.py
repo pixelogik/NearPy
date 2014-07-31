@@ -23,7 +23,7 @@
 import numpy
 import unittest
 
-from nearpy.distances import EuclideanDistance, CosineDistance
+from nearpy.distances import EuclideanDistance, CosineDistance, ManhattanDistance
 
 ########################################################################
 
@@ -40,7 +40,7 @@ def test_distance_symmetry(test_obj, distance):
         d_yx = distance.distance(y, x)
 
         # I had precision issues with a local install. This test is more tolerant to that.
-        test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.000000000000001))
+        test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.00000000000001))
 
 def test_distance_triangle_inequality(test_obj, distance):
     for k in range(100):
@@ -68,7 +68,6 @@ class TestEuclideanDistance(unittest.TestCase):
     def test_symmetry(self):
         test_distance_symmetry(self, self.euclidean)
 
-
 class TestCosineDistance(unittest.TestCase):
 
     def setUp(self):
@@ -77,6 +76,16 @@ class TestCosineDistance(unittest.TestCase):
     def test_symmetry(self):
         test_distance_symmetry(self, self.cosine)
 
+class TestManhattanDistance(unittest.TestCase):
+
+    def setUp(self):
+        self.manhattan = ManhattanDistance()
+
+    def test_triangle_inequality(self):
+        test_distance_triangle_inequality(self, self.manhattan)
+
+    def test_symmetry(self):
+        test_distance_symmetry(self, self.manhattan)
 
 if __name__ == '__main__':
     unittest.main()

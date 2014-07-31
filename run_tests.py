@@ -28,6 +28,10 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
 unittest.TextTestRunner(verbosity=2).run(suite)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestManhattanDistance)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
+suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestVectorFilters)
 unittest.TextTestRunner(verbosity=2).run(suite)
 

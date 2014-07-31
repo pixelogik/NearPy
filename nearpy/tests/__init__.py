@@ -25,6 +25,6 @@ from nearpy.tests.hashes_tests import TestRandomBinaryProjections, \
     TestRandomDiscretizedProjections, TestPCABinaryProjections
 from nearpy.tests.engine_tests import TestEngine
 from nearpy.tests.storage_tests import TestStorage
-from nearpy.tests.distances_tests import TestEuclideanDistance, TestCosineDistance
+from nearpy.tests.distances_tests import TestEuclideanDistance, TestCosineDistance, TestManhattanDistance
 from nearpy.tests.filters_tests import TestVectorFilters
 from nearpy.tests.experiments_tests import TestRecallExperiment
