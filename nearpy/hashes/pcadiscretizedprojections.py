@@ -74,6 +74,9 @@ class PCADiscretizedProjections(LSHash):
         # We need the component vectors to be in the rows
         self.components = numpy.transpose(self.components)
 
+        # This is only used in case we need to process sparse vectors
+        self.components_csr = None
+
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
         if self.dim != dim:
@@ -83,8 +86,19 @@ class PCADiscretizedProjections(LSHash):
         """
         Hashes the vector and returns the binary bucket key as string.
         """
-        # Project vector onto components
-        projection = numpy.dot(self.components, v)
-        projection = numpy.floor(projection / self.bin_width)
+        if scipy.sparse.issparse(v):
+            # If vector is sparse, make sure we have the CSR representation
+            # of the projection matrix
+            if self.components_csr == None:
+                self.components_csr = scipy.sparse.csr_matrix(self.components)
+            # Make sure that we are using CSR format for multiplication
+            if not scipy.sparse.isspmatrix_csr(v):
+                v = scipy.sparse.csr_matrix(v)
+            # Project vector onto all hyperplane normals
+            projection = (self.components_csr.dot(v) / self.bin_width).floor().toarray()
+        else:
+            # Project vector onto components
+            projection = numpy.dot(self.components, v)
+            projection = numpy.floor(projection / self.bin_width)
         # Return key
         return ['_'.join([str(int(x)) for x in projection])]

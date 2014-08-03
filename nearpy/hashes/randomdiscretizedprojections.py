@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 
 from nearpy.hashes.lshash import LSHash
 
@@ -45,7 +46,8 @@ class RandomDiscretizedProjections(LSHash):
         self.dim = None
         self.vectors = None
         self.bin_width = bin_width
-	self.rand = numpy.random.RandomState(rand_seed)
+        self.rand = numpy.random.RandomState(rand_seed)
+        self.vectors_csr = None
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
@@ -56,8 +58,19 @@ class RandomDiscretizedProjections(LSHash):
         """
         Hashes the vector and returns the binary bucket key as string.
         """
-        # Project vector onto all hyperplane normals
-        projection = numpy.dot(self.vectors, v)
-        projection = numpy.floor(projection / self.bin_width)
+        if scipy.sparse.issparse(v):
+            # If vector is sparse, make sure we have the CSR representation
+            # of the projection matrix
+            if self.vectors_csr == None:
+                self.vectors_csr = scipy.sparse.csr_matrix(self.vectors)
+            # Make sure that we are using CSR format for multiplication
+            if not scipy.sparse.isspmatrix_csr(v):
+                v = scipy.sparse.csr_matrix(v)
+            # Project vector onto all hyperplane normals
+            projection = (self.vectors_csr.dot(v) / self.bin_width).floor().toarray()
+        else:
+            # Project vector onto all hyperplane normals
+            projection = numpy.dot(self.vectors, v)
+            projection = numpy.floor(projection / self.bin_width)
         # Return key
         return ['_'.join([str(int(x)) for x in projection])]

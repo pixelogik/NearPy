@@ -21,11 +21,12 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 import unittest
 
 from nearpy.hashes import RandomBinaryProjections, \
     RandomDiscretizedProjections, \
-    PCABinaryProjections
+    PCABinaryProjections, PCADiscretizedProjections
 
 
 class TestRandomBinaryProjections(unittest.TestCase):
@@ -48,6 +49,19 @@ class TestRandomBinaryProjections(unittest.TestCase):
         for k in range(100):
             self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
 
+    def test_hash_format_sparse(self):
+        h = self.rbp.hash_vector(scipy.sparse.rand(100, 1))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+        self.assertEqual(len(h[0]), 10)
+        for c in h[0]:
+            self.assertTrue(c == '1' or c == '0')
+
+    def test_hash_deterministic_sparse(self):
+        x = scipy.sparse.rand(100, 1)
+        first_hash = self.rbp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
 
 class TestRandomDiscretizedProjections(unittest.TestCase):
 
@@ -66,6 +80,16 @@ class TestRandomDiscretizedProjections(unittest.TestCase):
         for k in range(100):
             self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
 
+    def test_hash_format_sparse(self):
+        h = self.rbp.hash_vector(scipy.sparse.rand(100, 1))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+
+    def test_hash_deterministic_sparse(self):
+        x = scipy.sparse.rand(100, 1)
+        first_hash = self.rbp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.rbp.hash_vector(x)[0])
 
 class TestPCABinaryProjections(unittest.TestCase):
 
@@ -86,6 +110,49 @@ class TestPCABinaryProjections(unittest.TestCase):
         first_hash = self.pbp.hash_vector(x)[0]
         for k in range(100):
             self.assertEqual(first_hash, self.pbp.hash_vector(x)[0])
+
+    def test_hash_format_sparse(self):
+        h = self.pbp.hash_vector(scipy.sparse.rand(10, 1))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+        self.assertEqual(len(h[0]), 4)
+        for c in h[0]:
+            self.assertTrue(c == '1' or c == '0')
+
+    def test_hash_deterministic_sparse(self):
+        x = scipy.sparse.rand(10, 1)
+        first_hash = self.pbp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.pbp.hash_vector(x)[0])
+
+
+class TestPCADiscretizedProjections(unittest.TestCase):
+
+    def setUp(self):
+        self.vectors = numpy.random.randn(10, 100)
+        self.pdp = PCADiscretizedProjections('pdp', 4, self.vectors, 0.1)
+
+    def test_hash_format(self):
+        h = self.pdp.hash_vector(numpy.random.randn(10))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+
+    def test_hash_deterministic(self):
+        x = numpy.random.randn(10)
+        first_hash = self.pdp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.pdp.hash_vector(x)[0])
+
+    def test_hash_format_sparse(self):
+        h = self.pdp.hash_vector(scipy.sparse.rand(10, 1))
+        self.assertEqual(len(h), 1)
+        self.assertEqual(type(h[0]), type(''))
+
+    def test_hash_deterministic_sparse(self):
+        x = scipy.sparse.rand(10, 1)
+        first_hash = self.pdp.hash_vector(x)[0]
+        for k in range(100):
+            self.assertEqual(first_hash, self.pdp.hash_vector(x)[0])
 
 
 if __name__ == '__main__':

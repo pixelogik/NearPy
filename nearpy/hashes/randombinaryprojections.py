@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 
 from nearpy.hashes.lshash import LSHash
 
@@ -47,7 +48,8 @@ class RandomBinaryProjections(LSHash):
         self.projection_count = projection_count
         self.dim = None
         self.normals = None
-	self.rand = numpy.random.RandomState(rand_seed)
+        self.rand = numpy.random.RandomState(rand_seed)
+        self.normals_csr = None
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
@@ -58,7 +60,18 @@ class RandomBinaryProjections(LSHash):
         """
         Hashes the vector and returns the binary bucket key as string.
         """
-        # Project vector onto all hyperplane normals
-        projection = numpy.dot(self.normals, v)
+        if scipy.sparse.issparse(v):
+            # If vector is sparse, make sure we have the CSR representation
+            # of the projection matrix
+            if self.normals_csr == None:
+                self.normals_csr = scipy.sparse.csr_matrix(self.normals)
+            # Make sure that we are using CSR format for multiplication
+            if not scipy.sparse.isspmatrix_csr(v):
+                v = scipy.sparse.csr_matrix(v)
+            # Project vector onto all hyperplane normals
+            projection = self.normals_csr.dot(v)
+        else:
+            # Project vector onto all hyperplane normals
+            projection = numpy.dot(self.normals, v)
         # Return binary key
         return [''.join(['1' if x > 0.0 else '0' for x in projection])]

@@ -22,7 +22,7 @@
 from __future__ import absolute_import
 
 from nearpy.tests.hashes_tests import TestRandomBinaryProjections, \
-    TestRandomDiscretizedProjections, TestPCABinaryProjections
+    TestRandomDiscretizedProjections, TestPCABinaryProjections, TestPCADiscretizedProjections
 from nearpy.tests.engine_tests import TestEngine
 from nearpy.tests.storage_tests import TestStorage
 from nearpy.tests.distances_tests import TestEuclideanDistance, TestCosineDistance, TestManhattanDistance
