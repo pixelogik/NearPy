@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 
 from nearpy.distances.distance import Distance
 
@@ -32,4 +33,8 @@ class EuclideanDistance(Distance):
         """
         Computes distance measure between vectors x and y. Returns float.
         """
-        return numpy.linalg.norm(x-y)
+        if scipy.sparse.issparse(x):
+            return numpy.linalg.norm((x-y).toarray().ravel())
+        else:
+            return numpy.linalg.norm(x-y)
+

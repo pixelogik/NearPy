@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 
 from nearpy.distances.distance import Distance
 
@@ -32,5 +33,8 @@ class ManhattanDistance(Distance):
         """
         Computes the Manhattan distance between vectors x and y. Returns float.
         """
-        return numpy.sum(numpy.absolute(x-y))
+        if scipy.sparse.issparse(x):
+            return numpy.sum(numpy.absolute((x-y).toarray().ravel()))
+        else:
+            return numpy.sum(numpy.absolute(x-y))
 

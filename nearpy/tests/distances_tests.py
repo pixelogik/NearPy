@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 import unittest
 
 from nearpy.distances import EuclideanDistance, CosineDistance, ManhattanDistance
@@ -42,11 +43,31 @@ def test_distance_symmetry(test_obj, distance):
         # I had precision issues with a local install. This test is more tolerant to that.
         test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.00000000000001))
 
+    for k in range(100):
+        x = scipy.sparse.rand(30, 1, density=0.3)
+        y = scipy.sparse.rand(30, 1, density=0.3)
+        d_xy = distance.distance(x, y)
+        d_yx = distance.distance(y, x)
+
+        # I had precision issues with a local install. This test is more tolerant to that.
+        test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.00000000000001))
+
 def test_distance_triangle_inequality(test_obj, distance):
     for k in range(100):
         x = numpy.random.randn(10)
         y = numpy.random.randn(10)
         z = numpy.random.randn(10)
+
+        d_xy = distance.distance(x, y)
+        d_xz = distance.distance(x, z)
+        d_yz = distance.distance(y, z)
+
+        test_obj.assertTrue(d_xy <= d_xz + d_yz)
+
+    for k in range(100):
+        x = scipy.sparse.rand(30, 1, density=0.3)
+        y = scipy.sparse.rand(30, 1, density=0.3)
+        z = scipy.sparse.rand(30, 1, density=0.3)
 
         d_xy = distance.distance(x, y)
         d_xz = distance.distance(x, z)

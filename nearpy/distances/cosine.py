@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 
 from nearpy.distances.distance import Distance
 
@@ -32,5 +33,8 @@ class CosineDistance(Distance):
         """
         Computes distance measure between vectors x and y. Returns float.
         """
+        if scipy.sparse.issparse(x):
+            x = x.toarray().ravel()
+            y = y.toarray().ravel()
         return 1.0 - numpy.dot(x, y) / (numpy.linalg.norm(x) *
                                         numpy.linalg.norm(y))

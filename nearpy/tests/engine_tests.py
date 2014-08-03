@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 import unittest
 
 from nearpy import Engine
@@ -45,6 +46,19 @@ class TestEngine(unittest.TestCase):
             self.assertEqual(y_data, x_data)
             self.assertEqual(y_distance, 0.0)
 
+    def test_retrieval_sparse(self):
+        for k in range(100):
+            self.engine.clean_all_buckets()
+            x = scipy.sparse.rand(1000, 1, density=0.05)
+            x_data = 'data'
+            self.engine.store_vector(x, x_data)
+            n = self.engine.neighbours(x)
+            y = n[0][0]
+            y_data = n[0][1]
+            y_distance = n[0][2]
+            self.assertTrue((y - x).sum() == 0.0)
+            self.assertEqual(y_data, x_data)
+            self.assertEqual(y_distance, 0.0)
 
 if __name__ == '__main__':
     unittest.main()
