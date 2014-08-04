@@ -30,6 +30,7 @@
 import redis
 import json
 import numpy
+import scipy
 
 from nearpy.storage.storage import Storage
 from nearpy.utils import want_string
@@ -48,13 +49,36 @@ class RedisStorage(Storage):
         """
         redis_key = 'nearpy_%s_%s' % (hash_name, bucket_key)
 
-        # Make sure it is a 1d vector
-        v = numpy.reshape(v, v.shape[0])
+        val_dict = {}
 
-        val_dict = {'vector': v.tolist()}
+        # Depending on type (sparse or not) fill value dict
+        if scipy.sparse.issparse(v):
+            # Make sure that we are using COO format (easy to handle)
+            if not scipy.sparse.isspmatrix_coo(v):
+                v = scipy.sparse.coo_matrix(v)
+
+            # Construct list of [index, value] items,
+            # one for each non-zero element of the sparse vector
+            encoded_values = []
+
+            for k in range(v.data.size):
+                row_index = v.row[k]
+                value = v.data[k]
+                encoded_values.append([int(row_index), value])
+
+            val_dict['sparse'] = 1
+            val_dict['nonzeros'] = encoded_values
+            val_dict['dim'] = v.shape[0]
+        else:
+            # Make sure it is a 1d vector
+            v = numpy.reshape(v, v.shape[0])
+            val_dict['vector'] = v.tolist()
+
+        # Add data if set
         if data:
             val_dict['data'] = data
 
+        # Push JSON representation of dict to end of bucket list
         self.redis_object.rpush(redis_key, json.dumps(val_dict))
 
     def get_bucket(self, hash_name, bucket_key):
@@ -66,7 +90,33 @@ class RedisStorage(Storage):
         results = []
         for item_str in items:
             val_dict = json.loads(want_string(item_str))
-            vector = numpy.fromiter(val_dict['vector'], dtype=numpy.float64)
+
+            # Depending on type (sparse or not) reconstruct vector
+            if 'sparse' in val_dict:
+
+                # Fill these for COO creation
+                row  = []
+                col  = []
+                data = []
+
+                # For each non-zero element, append values
+                for e in val_dict['nonzeros']:
+                    row.append(e[0]) # Row index
+                    data.append(e[1]) # Value
+                    col.append(0) # Column index (always 0)
+
+                # Create numpy arrays for COO creation
+                coo_row = numpy.array(row, dtype=numpy.int32)
+                coo_col = numpy.array(col, dtype=numpy.int32)
+                coo_data = numpy.array(data)
+
+                # Create COO sparse vector
+                vector = scipy.sparse.coo_matrix( (coo_data,(coo_row,coo_col)), shape=(val_dict['dim'],1) )
+
+            else:
+                vector = numpy.fromiter(val_dict['vector'], dtype=numpy.float64)
+
+            # Add data to result tuple, if present
             if 'data' in val_dict:
                 results.append((vector, val_dict['data']))
             else:

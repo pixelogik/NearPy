@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 import numpy
+import scipy
 import unittest
 
 from redis import Redis
@@ -70,6 +71,28 @@ class TestStorage(unittest.TestCase):
         self.assertEqual(type(x), type(y))
         for k in range(100):
             self.assertEqual(y[k], x[k])
+        self.assertEqual(type(y_data), type(x_data))
+        self.assertEqual(len(y_data), len(x_data))
+        for k in range(3):
+            self.assertEqual(y_data[k], x_data[k])
+        self.redis_storage.clean_all_buckets()
+        self.assertEqual(self.redis_storage.get_bucket('testHash',
+                                                       bucket_key), [])
+
+    def test_redis_storage_sparse(self):
+        self.redis_storage.clean_all_buckets()
+        x = scipy.sparse.rand(100, 1, density=0.1)
+        bucket_key = '23749283743928748'
+        x_data = ['one', 'two', 'three']
+        self.redis_storage.store_vector('testHash', bucket_key, x, x_data)
+        X = self.redis_storage.get_bucket('testHash', bucket_key)
+        self.assertEqual(len(X), 1)
+        y = X[0][0]
+        y_data = X[0][1]
+        self.assertEqual(type(x), type(y))
+        self.assertEqual(x.shape[0], y.shape[0])
+        self.assertEqual(x.shape[1], y.shape[1])
+        self.assertTrue((y - x).sum() == 0.0)
         self.assertEqual(type(y_data), type(x_data))
         self.assertEqual(len(y_data), len(x_data))
         for k in range(3):
