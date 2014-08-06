@@ -15,7 +15,8 @@ Read more here: http://nearpy.io
 
 ## Principle
 
-To find approximated nearest neighbours for each vector that should be indexed ('stored') a hash is generated, that is a string value. This hash is used as the bucket key
+To find approximated nearest neighbours for a query vector, first the vectors to be stored are indexed. For each vector that should be indexed ('stored') a hash is generated,
+that is a string value. This hash is used as the bucket key
 of the bucket the vector is then stored into. Buckets are in most cases just lists of vectors, it is the terminology used in these applications.
 
 This would not be of any use for finding nearest neighbours to a query vector. So the 'secret' to this mechanism is to use so called locality sensitive hashes, LSHs.
