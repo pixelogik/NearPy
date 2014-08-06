@@ -36,7 +36,7 @@ class UniqueFilter(VectorFilter):
     other feature for uniqueness, you can implement your own filter.
 
     You only need a uniqueness filter if your hash-configuration makes it
-    possible that one vecor is saved in many buckets.
+    possible that one vector is saved in many buckets.
     """
 
     def __init__(self):
