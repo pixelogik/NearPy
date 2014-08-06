@@ -45,7 +45,7 @@ The ANNS pipeline is configured for a fixed dimensionality of the feature space,
 The engine can use multiple LSHs and takes them from the lshashes parameter, that must be an array of
 LSHash objects.
 
-Depending on the kind if filters used during querying a distance measure can be specified. This is only
+Depending on the kind of filters used during querying a distance measure can be specified. This is only
 needed if you use filters that need a distance (like NearestFilter or DistanceThresholdFilter).
 
 Filters are used in a last step during querying nearest neighbours. Existing implementations are NearestFilter, DistanceThresholdFilter and UniqueFilter.
@@ -61,6 +61,7 @@ neighbours(self, v)
 ```
 store_vector() hashes vector v with all configured LSHs and stores it in all matching buckets in the storage.
 The optional data argument must be JSON-serializable. It is stored with the vector and will be returned in search results.
+It is best practice to use only database ids as attached 'data' and store the actual data in a database.
 
 neighbours() hashes vector v with all configured LSHs, collects all candidate vectors from the matching
 buckets in storage, applies the (optional) distance function and finally the (optional) filter function
@@ -81,8 +82,7 @@ constructor and reset methods.
     hash_vector(self, v)
 ```
 
-hash_vector() hashes the specified vector and returns a list of bucket keys, that match the vector.
-Depending on the hash implementation this list can contain one or many bucket keys.
+hash_vector() hashes the specified vector and returns a list of bucket keys with one or more entries.
 
 The LSH RandomBinaryProjections projects the specified vector on n random
 normalized vectors in the feature space and returns a string made from zeros and ones. If v lies on
