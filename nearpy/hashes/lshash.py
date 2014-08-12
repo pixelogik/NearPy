@@ -43,3 +43,14 @@ class LSHash(object):
         """
         raise NotImplementedError
 
+    def get_config(self):
+        """
+        Returns pickle-serializable configuration struct for storage.
+        """
+        raise NotImplementedError
+
+    def apply_config(self, config):
+        """
+        Applies config
+        """
+        raise NotImplementedError

@@ -43,6 +43,10 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestPCADiscretizedProjections)
 unittest.TextTestRunner(verbosity=2).run(suite)
 
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestHashStorage)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
 # TODO: Experiment tests are out of date!
 #suite = unittest.TestLoader().loadTestsFromTestCase(
 #    tests.TestRecallExperiment)

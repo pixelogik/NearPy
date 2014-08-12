@@ -31,6 +31,7 @@ import redis
 import json
 import numpy
 import scipy
+import pickle
 
 from nearpy.storage.storage import Storage
 from nearpy.utils import want_string
@@ -139,3 +140,16 @@ class RedisStorage(Storage):
         bucket_keys = self.redis_object.keys(pattern='nearpy_*')
         for bucket_key in bucket_keys:
             self.redis_object.delete(bucket_key)
+
+    def store_hash_configuration(self, lshash):
+        """
+        Stores hash configuration
+        """
+        self.redis_object.set(lshash.hash_name+'_conf', pickle.dumps(lshash.get_config()))
+
+    def load_hash_configuration(self, hash_name):
+        """
+        Loads and returns hash configuration
+        """
+        return pickle.loads(self.redis_object.get(hash_name+'_conf'))
+

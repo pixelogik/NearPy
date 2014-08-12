@@ -46,33 +46,35 @@ class PCADiscretizedProjections(LSHash):
         self.projection_count = projection_count
         self.bin_width = bin_width
 
-        # Get numpy array representation of input
-        training_set = numpy_array_from_list_or_numpy_array(training_set)
+        # Only do training if training set was specified
+        if not training_set is None:
+            # Get numpy array representation of input
+            training_set = numpy_array_from_list_or_numpy_array(training_set)
 
-        # Get subspace size from training matrix
-        self.dim = training_set.shape[0]
+            # Get subspace size from training matrix
+            self.dim = training_set.shape[0]
 
-        # Get transposed training set matrix for PCA
-        training_set_t = numpy.transpose(training_set)
+            # Get transposed training set matrix for PCA
+            training_set_t = numpy.transpose(training_set)
 
-        # Compute principal components
-        (eigenvalues, eigenvectors) = perform_pca(training_set_t)
+            # Compute principal components
+            (eigenvalues, eigenvectors) = perform_pca(training_set_t)
 
-        # Get largest N eigenvalue/eigenvector indices
-        largest_eigenvalue_indices = numpy.flipud(
-            scipy.argsort(eigenvalues))[:projection_count]
+            # Get largest N eigenvalue/eigenvector indices
+            largest_eigenvalue_indices = numpy.flipud(
+                scipy.argsort(eigenvalues))[:projection_count]
 
-        # Create matrix for first N principal components
-        self.components = numpy.zeros((self.dim,
-                                       len(largest_eigenvalue_indices)))
+            # Create matrix for first N principal components
+            self.components = numpy.zeros((self.dim,
+                                           len(largest_eigenvalue_indices)))
 
-        # Put first N principal components into matrix
-        for index in range(len(largest_eigenvalue_indices)):
-            self.components[:, index] = \
-                eigenvectors[:, largest_eigenvalue_indices[index]]
+            # Put first N principal components into matrix
+            for index in range(len(largest_eigenvalue_indices)):
+                self.components[:, index] = \
+                    eigenvectors[:, largest_eigenvalue_indices[index]]
 
-        # We need the component vectors to be in the rows
-        self.components = numpy.transpose(self.components)
+            # We need the component vectors to be in the rows
+            self.components = numpy.transpose(self.components)
 
         # This is only used in case we need to process sparse vectors
         self.components_csr = None
@@ -102,3 +104,28 @@ class PCADiscretizedProjections(LSHash):
             projection = numpy.floor(projection / self.bin_width)
         # Return key
         return ['_'.join([str(int(x)) for x in projection])]
+
+    def get_config(self):
+        """
+        Returns pickle-serializable configuration struct for storage.
+        """
+        # Fill this dict with config data
+        return {
+            'hash_name': self.hash_name,
+            'dim': self.dim,
+            'bin_width': self.bin_width,
+            'projection_count': self.projection_count,
+            'components': self.components
+        }
+
+    def apply_config(self, config):
+        """
+        Applies config
+        """
+        self.hash_name = config['hash_name']
+        self.dim = config['dim']
+        self.bin_width = config['bin_width']
+        self.projection_count = config['projection_count']
+        self.components = config['components']
+
+

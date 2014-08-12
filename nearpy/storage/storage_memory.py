@@ -35,6 +35,7 @@ class MemoryStorage(Storage):
 
     def __init__(self):
         self.buckets = {}
+        self.hash_configs = {}
 
     def store_vector(self, hash_name, bucket_key, v, data):
         """
@@ -68,3 +69,16 @@ class MemoryStorage(Storage):
         Removes all buckets from all hashes and their content.
         """
         self.buckets = {}
+
+    def store_hash_configuration(self, lshash):
+        """
+        Stores hash configuration
+        """
+        self.hash_configs[lshash.hash_name] = lshash.get_config()
+
+    def load_hash_configuration(self, hash_name):
+        """
+        Loads and returns hash configuration
+        """
+        return self.hash_configs[hash_name]
+

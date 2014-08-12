@@ -28,3 +28,4 @@ from nearpy.tests.storage_tests import TestStorage
 from nearpy.tests.distances_tests import TestEuclideanDistance, TestCosineDistance, TestManhattanDistance
 from nearpy.tests.filters_tests import TestVectorFilters
 from nearpy.tests.experiments_tests import TestRecallExperiment
+from nearpy.tests.hash_storage_tests import TestHashStorage

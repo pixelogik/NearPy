@@ -47,3 +47,18 @@ class Storage(object):
         Removes all buckets and their content.
         """
         raise NotImplementedError
+
+    def store_hash_configuration(self, lshash):
+        """
+        Stores hash configuration
+        """
+        raise NotImplementedError
+
+    def load_hash_configuration(self, hash_name):
+        """
+        Loads and returns hash configuration
+        """
+        raise NotImplementedError
+
+
+

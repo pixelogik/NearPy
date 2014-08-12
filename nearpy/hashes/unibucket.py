@@ -46,3 +46,19 @@ class UniBucket(LSHash):
         """
         # Return bucket key identical to vector string representation
         return [self.hash_name+'']
+
+    def get_config(self):
+        """
+        Returns pickle-serializable configuration struct for storage.
+        """
+        return {
+            'hash_name': self.hash_name,
+            'dim': self.dim
+        }
+
+    def apply_config(self, config):
+        """
+        Applies config
+        """
+        self.hash_name = config['hash_name']
+        self.dim = config['dim']

@@ -44,15 +44,16 @@ class RandomDiscretizedProjections(LSHash):
         super(RandomDiscretizedProjections, self).__init__(hash_name)
         self.projection_count = projection_count
         self.dim = None
-        self.vectors = None
+        self.normals = None
         self.bin_width = bin_width
         self.rand = numpy.random.RandomState(rand_seed)
-        self.vectors_csr = None
+        self.normals_csr = None
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
-        self.dim = dim
-        self.vectors = self.rand.randn(self.projection_count, dim)
+        if self.dim != dim:
+            self.dim = dim
+            self.normals = self.rand.randn(self.projection_count, dim)
 
     def hash_vector(self, v):
         """
@@ -61,16 +62,43 @@ class RandomDiscretizedProjections(LSHash):
         if scipy.sparse.issparse(v):
             # If vector is sparse, make sure we have the CSR representation
             # of the projection matrix
-            if self.vectors_csr == None:
-                self.vectors_csr = scipy.sparse.csr_matrix(self.vectors)
+            if self.normals_csr == None:
+                self.normals_csr = scipy.sparse.csr_matrix(self.normals)
             # Make sure that we are using CSR format for multiplication
             if not scipy.sparse.isspmatrix_csr(v):
                 v = scipy.sparse.csr_matrix(v)
             # Project vector onto all hyperplane normals
-            projection = (self.vectors_csr.dot(v) / self.bin_width).floor().toarray()
+            projection = (self.normals_csr.dot(v) / self.bin_width).floor().toarray()
         else:
             # Project vector onto all hyperplane normals
-            projection = numpy.dot(self.vectors, v)
+            projection = numpy.dot(self.normals, v)
             projection = numpy.floor(projection / self.bin_width)
         # Return key
         return ['_'.join([str(int(x)) for x in projection])]
+
+    def get_config(self):
+        """
+        Returns pickle-serializable configuration struct for storage.
+        """
+        # Fill this dict with config data
+        return {
+            'hash_name': self.hash_name,
+            'dim': self.dim,
+            'bin_width': self.bin_width,
+            'projection_count': self.projection_count,
+            'normals': self.normals
+        }
+
+    def apply_config(self, config):
+        """
+        Applies config
+        """
+        self.hash_name = config['hash_name']
+        self.dim = config['dim']
+        self.bin_width = config['bin_width']
+        self.projection_count = config['projection_count']
+        self.normals = config['normals']
+
+
+
+

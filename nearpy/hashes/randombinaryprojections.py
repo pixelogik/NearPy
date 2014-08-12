@@ -53,8 +53,9 @@ class RandomBinaryProjections(LSHash):
 
     def reset(self, dim):
         """ Resets / Initializes the hash for the specified dimension. """
-        self.dim = dim
-        self.normals = self.rand.randn(self.projection_count, dim)
+        if self.dim != dim:
+            self.dim = dim
+            self.normals = self.rand.randn(self.projection_count, dim)
 
     def hash_vector(self, v):
         """
@@ -75,3 +76,28 @@ class RandomBinaryProjections(LSHash):
             projection = numpy.dot(self.normals, v)
         # Return binary key
         return [''.join(['1' if x > 0.0 else '0' for x in projection])]
+
+    def get_config(self):
+        """
+        Returns pickle-serializable configuration struct for storage.
+        """
+        # Fill this dict with config data
+        return {
+            'hash_name': self.hash_name,
+            'dim': self.dim,
+            'projection_count': self.projection_count,
+            'normals': self.normals
+        }
+
+    def apply_config(self, config):
+        """
+        Applies config
+        """
+        self.hash_name = config['hash_name']
+        self.dim = config['dim']
+        self.projection_count = config['projection_count']
+        self.normals = config['normals']
+
+
+
+
