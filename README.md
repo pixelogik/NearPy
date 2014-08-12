@@ -105,6 +105,42 @@ the buckets. I do not have any tests on this and don't know if this makes sense 
 The LSH PCADiscretizedProjections is the pca version of RandomDiscretizedProjections, not using random vectors
 but the first n principal components of the training set, like PCABinaryProjections does it.
 
+## Hash configurations
+
+To save your index in Redis and re-use it after the indexing process is done you should persist
+your hash configurations so that afterwards you can re-create the same engine for more indexing
+or querying.
+
+This is done like this:
+
+```python
+# Create redis storage adapter
+redis_object = Redis(host='localhost', port=6379, db=0)
+redis_storage = RedisStorage(redis_object)
+
+# Get hash config from redis
+config = redis_storage.load_hash_configuration('MyHash')
+
+if config is None:
+    # Config is not existing, create hash from scratch, with 10 projections
+    lshash = RandomBinaryProjections('MyHash', 10)
+else:
+    # Config is existing, create hash with None parameters
+    lshash = RandomBinaryProjections(None, None)
+    # Apply configuration loaded from redis
+    lshash.apply_config(config)
+
+# Create engine for feature space of 100 dimensions and use our hash.
+# This will set the dimension of the lshash only the first time, not when
+# using the configuration loaded from redis.
+engine = Engine(100, lshs=[lshash])
+
+# Do some stuff like indexing or querying with the engine...
+
+# Finally store hash configuration in redis for later use
+redis_storage.store_hash_configuration(lshash)
+```
+
 ===========
 
 More docs to come...

@@ -47,7 +47,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.memory.store_hash_configuration(hash1)
 
-        hash2 = RandomBinaryProjections('testRBPHashWithLoadedConfig', None)
+        hash2 = RandomBinaryProjections(None, None)
         hash2.apply_config(self.memory.load_hash_configuration('testRBPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -64,7 +64,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.memory.store_hash_configuration(hash1)
 
-        hash2 = RandomDiscretizedProjections('testRDPHashWithLoadedConfig', None, None)
+        hash2 = RandomDiscretizedProjections(None, None, None)
         hash2.apply_config(self.memory.load_hash_configuration('testRDPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -82,7 +82,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.memory.store_hash_configuration(hash1)
 
-        hash2 = PCABinaryProjections('testPCABPHashWithLoadedConfig', None, None)
+        hash2 = PCABinaryProjections(None, None, None)
         hash2.apply_config(self.memory.load_hash_configuration('testPCABPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -100,7 +100,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.memory.store_hash_configuration(hash1)
 
-        hash2 = PCADiscretizedProjections('testPCADPHashWithLoadedConfig', None, None, None)
+        hash2 = PCADiscretizedProjections(None, None, None, None)
         hash2.apply_config(self.memory.load_hash_configuration('testPCADPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -119,7 +119,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.redis_storage.store_hash_configuration(hash1)
 
-        hash2 = RandomBinaryProjections('testRBPHashWithLoadedConfig', None)
+        hash2 = RandomBinaryProjections(None, None)
         hash2.apply_config(self.redis_storage.load_hash_configuration('testRBPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -136,7 +136,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.redis_storage.store_hash_configuration(hash1)
 
-        hash2 = RandomDiscretizedProjections('testRDPHashWithLoadedConfig', None, None)
+        hash2 = RandomDiscretizedProjections(None, None, None)
         hash2.apply_config(self.redis_storage.load_hash_configuration('testRDPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -154,7 +154,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.redis_storage.store_hash_configuration(hash1)
 
-        hash2 = PCABinaryProjections('testPCABPHashWithLoadedConfig', None, None)
+        hash2 = PCABinaryProjections(None, None, None)
         hash2.apply_config(self.redis_storage.load_hash_configuration('testPCABPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
@@ -172,7 +172,7 @@ class TestHashStorage(unittest.TestCase):
 
         self.redis_storage.store_hash_configuration(hash1)
 
-        hash2 = PCADiscretizedProjections('testPCADPHashWithLoadedConfig', None, None, None)
+        hash2 = PCADiscretizedProjections(None, None, None, None)
         hash2.apply_config(self.redis_storage.load_hash_configuration('testPCADPHash'))
 
         self.assertEqual(hash1.dim, hash2.dim)
