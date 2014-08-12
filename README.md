@@ -132,8 +132,9 @@ else:
 
 # Create engine for feature space of 100 dimensions and use our hash.
 # This will set the dimension of the lshash only the first time, not when
-# using the configuration loaded from redis.
-engine = Engine(100, lshashes=[lshash])
+# using the configuration loaded from redis. Use redis storage to store
+# buckets.
+engine = Engine(100, lshashes=[lshash], storage=redis_storage)
 
 # Do some stuff like indexing or querying with the engine...
 
