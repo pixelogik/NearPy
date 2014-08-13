@@ -26,4 +26,5 @@ from nearpy.hashes.randombinaryprojections import RandomBinaryProjections
 from nearpy.hashes.randomdiscretizedprojections import RandomDiscretizedProjections
 from nearpy.hashes.pcabinaryprojections import PCABinaryProjections
 from nearpy.hashes.pcadiscretizedprojections import PCADiscretizedProjections
+from nearpy.hashes.randombinaryprojectiontree import RandomBinaryProjectionTree
 from nearpy.hashes.unibucket import UniBucket

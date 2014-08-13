@@ -77,8 +77,34 @@ class Engine(object):
         # Store vector in each bucket of all hashes
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v):
+                #print 'Storying in bucket %s one vector' % bucket_key
                 self.storage.store_vector(lshash.hash_name, bucket_key,
                                           v, data)
+
+
+    def candidate_count(self, v):
+        """
+        Returns candidate count for nearest neighbour search for specified vector.
+        The candidate count is the count of vectors taken from all buckets the
+        specified vector is projected onto.
+
+        Use this method to check if your hashes are configured good. High candidate
+        counts makes querying slow.
+
+        For example if you always want to retrieve 20 neighbours but the candidate
+        count is 1000 or something you have to change the hash so that each bucket
+        has less entries (increase projection count for example).
+        """
+        # Collect candidates from all buckets from all hashes
+        candidates = []
+        for lshash in self.lshashes:
+            for bucket_key in lshash.hash_vector(v, querying=True):
+                bucket_content = self.storage.get_bucket(lshash.hash_name,
+                                                         bucket_key)
+                #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
+                candidates.extend(bucket_content)
+
+        return len(candidates)
 
     def neighbours(self, v):
         """
@@ -93,7 +119,10 @@ class Engine(object):
             for bucket_key in lshash.hash_vector(v, querying=True):
                 bucket_content = self.storage.get_bucket(lshash.hash_name,
                                                          bucket_key)
+                #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
                 candidates.extend(bucket_content)
+
+        #print 'Candidate count is %d' % len(candidates)
 
         # Apply distance implementation if specified
         if self.distance:

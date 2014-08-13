@@ -29,3 +29,4 @@ from nearpy.tests.distances_tests import TestEuclideanDistance, TestCosineDistan
 from nearpy.tests.filters_tests import TestVectorFilters
 from nearpy.tests.experiments_tests import TestRecallExperiment
 from nearpy.tests.hash_storage_tests import TestHashStorage
+from nearpy.tests.projection_trees_tests import TestRandomBinaryProjectionTree
