@@ -197,7 +197,8 @@ class RandomBinaryProjectionTree(LSHash):
             'dim': self.dim,
             'projection_count': self.projection_count,
             'normals': self.normals,
-            'tree_root': self.tree_root
+            'tree_root': self.tree_root,
+            'minimum_result_size': self.minimum_result_size
         }
 
     def apply_config(self, config):
@@ -209,6 +210,7 @@ class RandomBinaryProjectionTree(LSHash):
         self.projection_count = config['projection_count']
         self.normals = config['normals']
         self.tree_root = config['tree_root']
+        self.minimum_result_size = config['minimum_result_size']
 
 
 
