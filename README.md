@@ -191,7 +191,7 @@ result set size you want to have. For example if the result set size is 20 and t
 is mostly > 200, you waste a lot of performance. The higher the candidate set is the more exact the
 retrieval is (because it is more likely that candidates are real nearest neighbours) but the slower it gets.
 
-I will soon perform experiments on best practives regarding average candidate count and other hash configuration
+I will soon perform experiments on best practices regarding average candidate count and other hash configuration
 aspects.
 
 ===========
