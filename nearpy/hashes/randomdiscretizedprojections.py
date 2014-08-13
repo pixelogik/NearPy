@@ -55,7 +55,7 @@ class RandomDiscretizedProjections(LSHash):
             self.dim = dim
             self.normals = self.rand.randn(self.projection_count, dim)
 
-    def hash_vector(self, v):
+    def hash_vector(self, v, querying=False):
         """
         Hashes the vector and returns the binary bucket key as string.
         """

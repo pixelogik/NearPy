@@ -35,11 +35,12 @@ class LSHash(object):
         """ Resets / Initializes the hash for the specified dimension. """
         raise NotImplementedError
 
-    def hash_vector(self, v):
+    def hash_vector(self, v, querying=False):
         """
         Hashes the vector and returns a list of bucket keys, that match the
         vector. Depending on the hash implementation this list can contain
-        one or many bucket keys.
+        one or many bucket keys. Querying is True if this is used for
+        retrieval and not indexing.
         """
         raise NotImplementedError
 

@@ -84,7 +84,7 @@ class PCADiscretizedProjections(LSHash):
         if self.dim != dim:
             raise Exception('PCA hash is trained for specific dimension!')
 
-    def hash_vector(self, v):
+    def hash_vector(self, v, querying=False):
         """
         Hashes the vector and returns the binary bucket key as string.
         """

@@ -40,7 +40,7 @@ class UniBucket(LSHash):
         """ Resets / Initializes the hash for the specified dimension. """
         self.dim = dim
 
-    def hash_vector(self, v):
+    def hash_vector(self, v, querying=False):
         """
         Hashes the vector and returns the bucket key as string.
         """
