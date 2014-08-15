@@ -22,6 +22,7 @@
 
 import numpy
 import scipy
+import scipy.sparse
 
 from nearpy.hashes.lshash import LSHash
 
