@@ -26,9 +26,16 @@ from bitarray import bitarray
 
 from nearpy.permutation.permute import Permute
 
+
 class PermutedIndex:
 
-    def __init__(self,lshash,buckets,num_permutation,beam_size,num_neighbour):
+    def __init__(
+            self,
+            lshash,
+            buckets,
+            num_permutation,
+            beam_size,
+            num_neighbour):
 
         # lshash, buckets are coresponding
         self.num_permutation = num_permutation
@@ -53,38 +60,35 @@ class PermutedIndex:
         self.permuted_lists = []
         i = 0
         for p in self.permutes:
-            logging.info('Creating Permutated Index for {}: #{}/{}'.format(lshash.hash_name,i,len(self.permuted_lists)))
-            i+=1
+            logging.info(
+                'Creating Permutated Index for {}: #{}/{}'.format(lshash.hash_name, i, len(self.permuted_lists)))
+            i += 1
             permuted_list = []
             for ba in original_keys:
                 c = ba.copy()
                 p.permute(c)
-                permuted_list.append((c,ba))
+                permuted_list.append((c, ba))
             # sort the list
             permuted_list = sorted(permuted_list)
             self.permuted_lists.append(permuted_list)
 
-       
-    def hamming_distance(self,a,b):
+    def hamming_distance(self, a, b):
         return int((a ^ b).count())
 
-
-    def get_neighbour_keys(self,bucket_key,k):
+    def get_neighbour_keys(self, bucket_key, k):
         # O( np*beam*log(np*beam) )
         # np = number of permutations
         # beam = self.beam_size
         # np * beam == 200 * 100 Still really fast
-        
+
         query_key = bitarray(bucket_key)
         topk = set()
         for i in xrange(len(self.permutes)):
             p = self.permutes[i]
             plist = self.permuted_lists[i]
-            candidates = p.search_revert(plist,query_key,self.beam_size)
+            candidates = p.search_revert(plist, query_key, self.beam_size)
             topk = topk.union(set(candidates))
         topk = list(topk)
-        topk = sorted(topk, key = lambda x : self.hamming_distance(x,query_key))
+        topk = sorted(topk, key=lambda x: self.hamming_distance(x, query_key))
         topk_bin = [x.to01() for x in topk[:k]]
         return topk_bin
-
-

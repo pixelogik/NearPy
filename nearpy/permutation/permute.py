@@ -25,35 +25,37 @@ import random
 from bitarray import bitarray
 from bisect import bisect_left
 
+
 class Permute:
+
     """
-    [n] -> [n] permute operation 
+    [n] -> [n] permute operation
     e.g, a [3] -> [3] permute operation could be:
     [0,1,2] -> [1,0,2], "010" => "100"
     """
 
-    def __init__(self,n):
+    def __init__(self, n):
         m = range(n)
-        for end in xrange(n-1,0,-1):
-            r = random.randint(0,end)
+        for end in xrange(n - 1, 0, -1):
+            r = random.randint(0, end)
             tmp = m[end]
             m[end] = m[r]
             m[r] = tmp
         self.mapping = m
-    
-    def permute(self,ba): # inplace
+
+    def permute(self, ba):  # inplace
         c = ba.copy()
         for i in xrange(len(self.mapping)):
             ba[i] = c[self.mapping[i]]
         return ba
-        
-    def revert(self,ba):
+
+    def revert(self, ba):
         c = ba.copy()
         for i in xrange(len(self.mapping)):
             ba[self.mapping[i]] = c[i]
         return ba
 
-    def search_revert(self,bas,ba,beam_size):
+    def search_revert(self, bas, ba, beam_size):
         """
         ba: query bitarray
         bas: a sorted list of tuples of (permuted bitarray, original bitarray)
@@ -63,9 +65,9 @@ class Permute:
         self.permute(pba)
         assert(beam_size % 2 == 0)
         half_beam = beam_size / 2
-        idx = bisect_left(bas,(pba,ba))
-        start = max(0,idx - half_beam)
-        end = min(len(bas),idx+half_beam)
-        res =  bas[start:end]
+        idx = bisect_left(bas, (pba, ba))
+        start = max(0, idx - half_beam)
+        end = min(len(bas), idx + half_beam)
+        res = bas[start:end]
         res = [x[1] for x in res]
         return res
