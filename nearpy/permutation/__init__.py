@@ -20,36 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import numpy
-import scipy
+from __future__ import absolute_import
 
-from nearpy.distances.distance import Distance
-
-
-class CosineDistance(Distance):
-    """  Uses 1-cos(angle(x,y)) as distance measure. """
-
-    def distance(self, x, y):
-        """
-        Computes distance measure between vectors x and y. Returns float.
-        """
-        if scipy.sparse.issparse(x):
-            x = x.toarray().ravel()
-            y = y.toarray().ravel()
-        return 1.0 - numpy.dot(x, y) / (numpy.linalg.norm(x) *
-                                        numpy.linalg.norm(y))
-
-    
-    def distance_matrix(self,a,b):
-        """
-        Computes distance measure between matrix x and matrix y. Return Matrix.
-        """
-        # a,b should be matrix
-        # each row is a vector in a, b
-        dt = numpy.dot(a,b.T)
-        norm_a = numpy.sqrt(numpy.sum(a * a, axis = 1))
-        norm_a = norm_a.reshape((len(norm_a),1))
-        norm_b = numpy.sqrt(numpy.sum(b * b, axis = 1))
-        norm_b = norm_b.reshape((len(norm_b),1))
-        cos_matrix = dt / ( numpy.dot( norm_a , norm_b.T))
-        return 1.0-cos_matrix
+from nearpy.permutation.permutation import Permutation
