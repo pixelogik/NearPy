@@ -64,6 +64,7 @@ class HashPermutations(LSHash):
         # Reset all child hashes
         for child_hash in self.child_hashes:
             child_hash['hash'].reset(dim)
+            child_hash['bucket_keys'] = {}
 
     def hash_vector(self, v, querying=False):
         """
