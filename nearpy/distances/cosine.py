@@ -39,7 +39,7 @@ class CosineDistance(Distance):
         return 1.0 - numpy.dot(x, y) / (numpy.linalg.norm(x) *
                                         numpy.linalg.norm(y))
 
-    
+
     def distance_matrix(self,a,b):
         """
         Computes distance measure between matrix x and matrix y. Return Matrix.

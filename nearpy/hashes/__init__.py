@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
 from __future__ import absolute_import
 
 from nearpy.hashes.lshash import LSHash
@@ -27,4 +28,5 @@ from nearpy.hashes.randomdiscretizedprojections import RandomDiscretizedProjecti
 from nearpy.hashes.pcabinaryprojections import PCABinaryProjections
 from nearpy.hashes.pcadiscretizedprojections import PCADiscretizedProjections
 from nearpy.hashes.randombinaryprojectiontree import RandomBinaryProjectionTree
+from nearpy.hashes.permutation.hashpermutations import HashPermutations
 from nearpy.hashes.unibucket import UniBucket

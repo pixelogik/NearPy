@@ -31,7 +31,6 @@ from nearpy.filters import NearestFilter
 from nearpy.distances import EuclideanDistance
 from nearpy.distances import CosineDistance
 from nearpy.storage import MemoryStorage
-from nearpy.permutation import Permutation
 
 
 class Engine(object):
@@ -132,8 +131,20 @@ class Engine(object):
 
         # Apply distance implementation if specified
         if self.distance:
-            candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
-                          in candidates]
+            if isinstance(self.distance,CosineDistance):
+               # Use distance matrix computation
+                candidate_matrix = np.zeros((len(candidates),self.lshashes[0].dim))
+                for i in xrange(len(candidates)):
+                    candidate_matrix[i] = candidates[i][0]
+                    npv = np.array(v)
+                    npv = npv.reshape((1,len(npv)))
+                    cos_dists = self.distance.distance_matrix(candidate_matrix,npv)
+                    cos_dists = cos_dists.reshape((-1,))
+                candidates = [(candidates[i][0], candidates[i][1], cos_dists[i]) for i in xrange(len(candidates))]
+            else:
+                candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
+                              in candidates]
+
 
         # Apply vector filters if specified and return filtered list
         if self.vector_filters:
@@ -153,80 +164,3 @@ class Engine(object):
     def clean_buckets(self, hash_name):
         """ Clears buckets in storage (removes all vectors and their data). """
         self.storage.clean_buckets(hash_name)
-
-    #### Edited By Xing Shi (xingshi@usc.edu) ####
-    
-    def build_permuted_index(self,permute_configs):
-        """
-        Build PermutedIndex for all your binary hashings. 
-        PermutedIndex would be used to find the neighbour bucket key
-        in terms of Hamming distance. Permute_configs is nested dict
-        in the following format:
-        permuted_config = {"<hash_name>":
-                           { "num_permutation":50,
-                             "beam_size":10,
-                             "num_neighbour":100 }
-                          }
-        """
-        # permute_configs = {hash_name:{num_permutation,beam_size}}
-        self.permutation = Permutation()
-
-        for lshash in self.lshashes:
-            if isinstance(lshash,PCABinaryProjections) or isinstance(lshash,RandomBinaryProjections) or isinstance(lshash,RandomBinaryProjectionTree):
-                if lshash.hash_name in permute_configs:
-                    config = permute_configs[lshash.hash_name]
-                    num_permutation = config['num_permutation']
-                    beam_size = config['beam_size']
-                    num_neighbour = config['num_neighbour']
-                    buckets = self.storage.buckets[lshash.hash_name]
-                    self.permutation.build_permuted_index(lshash,buckets,num_permutation,beam_size,num_neighbour)
-
-    def neighbours_p(self, v):
-        """
-        Hashes vector v, collects all candidate vectors from the matching
-        buckets and neighbouring buckets in storage, applys the (optional) 
-        distance function and finally the (optional) filter function to 
-        construct the returned list of either (vector, data, distance) 
-        tuples or (vector, data) tuples.
-        """
-        # Collect candidates from all buckets from all hashes
-        candidates = []
-        for lshash in self.lshashes:
-            for bucket_key in lshash.hash_vector(v, querying=True):
-                bucket_content = []
-                if lshash.hash_name in self.permutation.permutedIndexs:
-                    neighbour_keys = self.permutation.get_neighbour_keys(lshash.hash_name,bucket_key)
-                    for nkey in neighbour_keys:
-                        bucket_content.extend(self.storage.get_bucket(lshash.hash_name,nkey))
-                else:
-                    bucket_content = self.storage.get_bucket(lshash.hash_name,
-                                                             bucket_key)
-                #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
-                candidates.extend(bucket_content)
-
-        # Apply distance implementation if specified
-        if self.distance:
-            if isinstance(self.distance,CosineDistance):
-               # calculate cosine distance in Numpy
-                candidate_matrix = np.zeros((len(candidates),self.lshashes[0].dim))
-                for i in xrange(len(candidates)):
-                    candidate_matrix[i] = candidates[i][0]
-                    npv = np.array(v)
-                    npv = npv.reshape((1,len(npv)))
-                    cos_dists = self.distance.distance_matrix(candidate_matrix,npv)
-                    cos_dists = cos_dists.reshape((-1,))                        
-                candidates = [(candidates[i][0], candidates[i][1], cos_dists[i]) for i in xrange(len(candidates))]
-            else:
-                candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
-                              in candidates]
-
-        # Apply vector filters if specified and return filtered list
-        if self.vector_filters:
-            filter_input = candidates
-            for vector_filter in self.vector_filters:
-                filter_input = vector_filter.filter_vectors(filter_input)
-            # Return output of last filter
-            return filter_input
-
-        # If there is no vector filter, just return list of candidates
-        return candidates

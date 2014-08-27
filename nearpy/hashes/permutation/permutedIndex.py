@@ -24,7 +24,7 @@ import logging
 
 from bitarray import bitarray
 
-from nearpy.permutation.permute import Permute
+from nearpy.hashes.permutation.permute import Permute
 
 
 class PermutedIndex:

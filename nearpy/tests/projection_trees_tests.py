@@ -49,19 +49,19 @@ class TestRandomBinaryProjectionTree(unittest.TestCase):
         self.engine = Engine(100, lshashes=[rbpt], vector_filters=[NearestFilter(20)])
 
         # First insert 200000 random vectors
-        print 'Indexing...'
+        #print 'Indexing...'
         for k in range(200000):
             x = numpy.random.randn(100)
             x_data = 'data'
             self.engine.store_vector(x, x_data)
 
         # Now do random queries and check result set size
-        print 'Querying...'
+        #print 'Querying...'
         for k in range(10):
             x = numpy.random.randn(100)
             n = self.engine.neighbours(x)
-            print "Candidate count = %d" % self.engine.candidate_count(x)
-            print "Result size = %d" % len(n)
+            #print "Candidate count = %d" % self.engine.candidate_count(x)
+            #print "Result size = %d" % len(n)
             self.assertEqual(len(n), 20)
 
     def test_storage_memory(self):

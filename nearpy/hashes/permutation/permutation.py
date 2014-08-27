@@ -20,6 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from __future__ import absolute_import
+#from bitarray import bitarray
 
-from nearpy.permutation.permutation import Permutation
+from nearpy.hashes.permutation.permute import Permute
+from nearpy.hashes.permutation.permutedIndex import PermutedIndex
+
+
+class Permutation:
+
+    """
+    The pumutation class
+    """
+
+    def __init__(self):
+        # self.permutedIndexs' key is the corresponding lshash's hash_name
+        self.permutedIndexs = {}
+
+    def build_permuted_index(
+            self,
+            lshash,
+            buckets,
+            num_permutation,
+            beam_size,
+            num_neighbour):
+        pi = PermutedIndex(
+            lshash,
+            buckets,
+            num_permutation,
+            beam_size,
+            num_neighbour)
+        hash_name = lshash.hash_name
+        self.permutedIndexs[hash_name] = pi
+
+    def get_neighbour_keys(self, hash_name, bucket_key):
+        permutedIndex = self.permutedIndexs[hash_name]
+        return permutedIndex.get_neighbour_keys(
+            bucket_key,
+            permutedIndex.num_neighbour)
