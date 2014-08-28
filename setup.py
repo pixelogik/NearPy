@@ -23,6 +23,7 @@ setup(
     install_requires=[
         "numpy",
         "scipy",
-        "redis"
+        "redis",
+        "bitarray"
     ],
 )
