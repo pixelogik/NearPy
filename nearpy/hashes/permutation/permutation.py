@@ -20,13 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from __future__ import absolute_import
+#from bitarray import bitarray
 
-from nearpy.hashes.lshash import LSHash
-from nearpy.hashes.randombinaryprojections import RandomBinaryProjections
-from nearpy.hashes.randomdiscretizedprojections import RandomDiscretizedProjections
-from nearpy.hashes.pcabinaryprojections import PCABinaryProjections
-from nearpy.hashes.pcadiscretizedprojections import PCADiscretizedProjections
-from nearpy.hashes.randombinaryprojectiontree import RandomBinaryProjectionTree
-from nearpy.hashes.permutation.hashpermutations import HashPermutations
-from nearpy.hashes.unibucket import UniBucket
+from nearpy.hashes.permutation.permute import Permute
+from nearpy.hashes.permutation.permutedIndex import PermutedIndex
+
+
+class Permutation:
+
+    """
+    The pumutation class
+    """
+
+    def __init__(self):
+        # self.permutedIndexs' key is the corresponding lshash's hash_name
+        self.permutedIndexs = {}
+
+    def build_permuted_index(
+            self,
+            lshash,
+            buckets,
+            num_permutation,
+            beam_size,
+            num_neighbour):
+        pi = PermutedIndex(
+            lshash,
+            buckets,
+            num_permutation,
+            beam_size,
+            num_neighbour)
+        hash_name = lshash.hash_name
+        self.permutedIndexs[hash_name] = pi
+
+    def get_neighbour_keys(self, hash_name, bucket_key):
+        permutedIndex = self.permutedIndexs[hash_name]
+        return permutedIndex.get_neighbour_keys(
+            bucket_key,
+            permutedIndex.num_neighbour)

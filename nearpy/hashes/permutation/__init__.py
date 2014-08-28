@@ -22,11 +22,4 @@
 
 from __future__ import absolute_import
 
-from nearpy.hashes.lshash import LSHash
-from nearpy.hashes.randombinaryprojections import RandomBinaryProjections
-from nearpy.hashes.randomdiscretizedprojections import RandomDiscretizedProjections
-from nearpy.hashes.pcabinaryprojections import PCABinaryProjections
-from nearpy.hashes.pcadiscretizedprojections import PCADiscretizedProjections
-from nearpy.hashes.randombinaryprojectiontree import RandomBinaryProjectionTree
-from nearpy.hashes.permutation.hashpermutations import HashPermutations
-from nearpy.hashes.unibucket import UniBucket
+from nearpy.hashes.permutation.permutation import Permutation

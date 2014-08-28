@@ -51,6 +51,10 @@ suite = unittest.TestLoader().loadTestsFromTestCase(
     tests.TestRandomBinaryProjectionTree)
 unittest.TextTestRunner(verbosity=2).run(suite)
 
+suite = unittest.TestLoader().loadTestsFromTestCase(
+    tests.TestPermutation)
+unittest.TextTestRunner(verbosity=2).run(suite)
+
 # TODO: Experiment tests are out of date!
 #suite = unittest.TestLoader().loadTestsFromTestCase(
 #    tests.TestRecallExperiment)
