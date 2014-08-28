@@ -62,12 +62,16 @@ class Engine(object):
     def __init__(self, dim, lshashes=[RandomBinaryProjections('default', 10)],
                  distance=EuclideanDistance(),
                  vector_filters=[NearestFilter(10)],
-                 storage=MemoryStorage()):
+                 storage=None):
         """ Keeps the configuration. """
         self.lshashes = lshashes
         self.distance = distance
         self.vector_filters = vector_filters
-        self.storage = storage
+
+        if not storage:
+            self.storage = MemoryStorage()
+        else:
+            self.storage = storage
 
         # Initialize all hashes for the data space dimension.
         for lshash in self.lshashes:
