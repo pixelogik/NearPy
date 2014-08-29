@@ -74,7 +74,6 @@ class TestPermutation(unittest.TestCase):
 
         # Do random query on engine without permutations meta-hash
         print '\nNeighbour distances without permuted index (distances should be larger):'
-        query = numpy.random.randn(200)
         results = self.engine.neighbours(query)
         dists = [x[2] for x in results]
         print dists
