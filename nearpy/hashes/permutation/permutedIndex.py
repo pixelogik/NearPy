@@ -28,6 +28,39 @@ from nearpy.hashes.permutation.permute import Permute
 
 
 class PermutedIndex:
+    """
+    The goal of permutedIndex is to help find the neighbours, 
+    in term of Hamming distance, of a query key in a set of binary keys.
+    
+    PermutedIndex is essentially a number of sorted permuted key lists 
+    (self.permuted_lists stores all these lists). Each list correspond 
+    to a Permute object, which helps permute a binary key.
+    
+    For example, a set a binary keys: ['00011','00001','00111','01111','10000'], 
+    and we want to find the 1-neighbour of '00001'.
+    
+    If we just sort the original list, i.e. ['00001','00011','00111','01111','10000'], 
+    the 1-neighbour of '00001' in the sorted list, '00011', is not the cloest neighbour 
+    in term of Hamming distance. 
+    
+    Here's an approximate solution:
+    1) permute every binary key in the list using a map [1,2,3,4,5]=>[2,3,4,5,1], 
+       then the permuted list is ['00110','00010','01110','11110','00001']. 
+    2) Sorted the permuted list, => ['00001','00010','00110','01110','11110'].
+    3) Given the query key '00001', permute it, => '00010'.
+    4) Using the permuted query key to do a binary search in the sorted permuted list, 
+       get the neighbours, '00001' and '00110'.
+    5) Doing a reversed permutation on the neighbours, => '10000' and '00011'.
+    5) The real neighbour in term of Hamming distance is found: '10000'.
+    
+    Often, only one permuted list is not enough to find all the neighbours. 
+    The more permuted lists, the more neighbours we can find. The parameter num_permutation
+    specifies how many permuted lists will be created.
+    
+    In the step 4, after we find the position of permuted query key in the list, 
+    it's better to return more neighbours around that place as candidates. 
+    The parameter beam_size specifies how many neighbours in the sorted list will be returned. 
+    """
 
     def __init__(
             self,
@@ -37,7 +70,6 @@ class PermutedIndex:
             beam_size,
             num_neighbour):
 
-        # lshash, buckets are coresponding
         self.num_permutation = num_permutation
         self.beam_size = beam_size
         self.lshash = lshash
@@ -76,12 +108,18 @@ class PermutedIndex:
         return int((a ^ b).count())
 
     def get_neighbour_keys(self, bucket_key, k):
-        # O( np*beam*log(np*beam) )
-        # np = number of permutations
-        # beam = self.beam_size
-        # np * beam == 200 * 100 Still really fast
-
+        """
+        The computing complexity is O( np*beam*log(np*beam) )
+        where,
+        np = number of permutations
+        beam = self.beam_size
+        
+        Make sure np*beam is much less than the number of bucket keys, 
+        otherwise we could use brute-force to get the neighbours
+        """
+        # convert query_key into bitarray
         query_key = bitarray(bucket_key)
+
         topk = set()
         for i in xrange(len(self.permutes)):
             p = self.permutes[i]
@@ -89,6 +127,9 @@ class PermutedIndex:
             candidates = p.search_revert(plist, query_key, self.beam_size)
             topk = topk.union(set(candidates))
         topk = list(topk)
+        
+        # sort the topk neighbour keys according to the Hamming distance to qurey key
         topk = sorted(topk, key=lambda x: self.hamming_distance(x, query_key))
+        # return the top k items
         topk_bin = [x.to01() for x in topk[:k]]
         return topk_bin

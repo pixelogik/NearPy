@@ -29,12 +29,15 @@ from bisect import bisect_left
 class Permute:
 
     """
-    [n] -> [n] permute operation
+    Permute provide a random [n] -> [n] permute operation.
     e.g, a [3] -> [3] permute operation could be:
     [0,1,2] -> [1,0,2], "010" => "100"
     """
 
     def __init__(self, n):
+        """
+        Init a Permute object. Randomly generate a mapping, e.g. [0,1,2] -> [1,0,2]
+        """
         m = range(n)
         for end in xrange(n - 1, 0, -1):
             r = random.randint(0, end)
@@ -43,13 +46,19 @@ class Permute:
             m[r] = tmp
         self.mapping = m
 
-    def permute(self, ba):  # inplace
+    def permute(self, ba):
+        """
+        Permute the bitarray ba inplace.
+        """
         c = ba.copy()
         for i in xrange(len(self.mapping)):
             ba[i] = c[self.mapping[i]]
         return ba
 
     def revert(self, ba):
+        """
+        Reversely permute the bitarray ba inplace.
+        """
         c = ba.copy()
         for i in xrange(len(self.mapping)):
             ba[self.mapping[i]] = c[i]
@@ -65,9 +74,14 @@ class Permute:
         self.permute(pba)
         assert(beam_size % 2 == 0)
         half_beam = beam_size / 2
+
+        # binary search (pba,ba) in bas
         idx = bisect_left(bas, (pba, ba))
+
         start = max(0, idx - half_beam)
         end = min(len(bas), idx + half_beam)
         res = bas[start:end]
+
+        # return the original(unpermuted) keys
         res = [x[1] for x in res]
         return res
