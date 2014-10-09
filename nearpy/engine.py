@@ -54,14 +54,18 @@ class Engine(object):
                 tuples.
     """
 
-    def __init__(self, dim, lshashes=[RandomBinaryProjections('default', 10)],
-                 distance=EuclideanDistance(),
-                 vector_filters=[NearestFilter(10)],
-                 storage=MemoryStorage()):
+    def __init__(self, dim, lshashes=None,
+                 distance=None,
+                 vector_filters=None,
+                 storage=None):
         """ Keeps the configuration. """
+        if lshashes is None: lshashes = [RandomBinaryProjections('default', 10)]
         self.lshashes = lshashes
+        if distance is None: distance = EuclideanDistance()
         self.distance = distance
+        if vector_filters is None: vector_filters = [NearestFilter(10)]
         self.vector_filters = vector_filters
+        if storage is None: storage = MemoryStorage()
         self.storage = storage
 
         # Initialize all hashes for the data space dimension.
