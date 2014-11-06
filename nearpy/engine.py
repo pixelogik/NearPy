@@ -22,9 +22,14 @@
 
 import json
 
+import numpy as np
+
 from nearpy.hashes import RandomBinaryProjections
+from nearpy.hashes import PCABinaryProjections
+from nearpy.hashes import RandomBinaryProjectionTree
 from nearpy.filters import NearestFilter
 from nearpy.distances import EuclideanDistance
+from nearpy.distances import CosineDistance
 from nearpy.storage import MemoryStorage
 
 
@@ -130,8 +135,20 @@ class Engine(object):
 
         # Apply distance implementation if specified
         if self.distance:
-            candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
-                          in candidates]
+            if isinstance(self.distance,CosineDistance):
+               # Use distance matrix computation
+                candidate_matrix = np.zeros((len(candidates),self.lshashes[0].dim))
+                for i in xrange(len(candidates)):
+                    candidate_matrix[i] = candidates[i][0]
+                    npv = np.array(v)
+                    npv = npv.reshape((1,len(npv)))
+                    cos_dists = self.distance.distance_matrix(candidate_matrix,npv)
+                    cos_dists = cos_dists.reshape((-1,))
+                candidates = [(candidates[i][0], candidates[i][1], cos_dists[i]) for i in xrange(len(candidates))]
+            else:
+                candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
+                              in candidates]
+
 
         # Apply vector filters if specified and return filtered list
         if self.vector_filters:
