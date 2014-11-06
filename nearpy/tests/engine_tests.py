@@ -32,6 +32,18 @@ class TestEngine(unittest.TestCase):
     def setUp(self):
         self.engine = Engine(1000)
 
+    def test_storage_issue(self):
+        engine1 = Engine(100)
+        engine2 = Engine(100)
+
+        for k in range(1000):
+            x = numpy.random.randn(100)
+            x_data = 'data'
+            engine1.store_vector(x, x_data)
+
+        # Each engine should have its own default storage
+        self.assertTrue(len(engine2.storage.buckets)==0)
+
     def test_retrieval(self):
         for k in range(100):
             self.engine.clean_all_buckets()
