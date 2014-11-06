@@ -32,9 +32,9 @@ import json
 import numpy
 import scipy
 import pickle
+import cPickle
 
 from nearpy.storage.storage import Storage
-from nearpy.utils import want_string
 
 
 class RedisStorage(Storage):
@@ -73,14 +73,16 @@ class RedisStorage(Storage):
         else:
             # Make sure it is a 1d vector
             v = numpy.reshape(v, v.shape[0])
-            val_dict['vector'] = v.tolist()
+            val_dict['vector'] = v.tostring()
+
+        val_dict['dtype'] = v.dtype.name
 
         # Add data if set
         if data:
             val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
-        self.redis_object.rpush(redis_key, json.dumps(val_dict))
+        self.redis_object.rpush(redis_key, cPickle.dumps(val_dict, protocol=2))
 
     def get_bucket(self, hash_name, bucket_key):
         """
@@ -90,7 +92,7 @@ class RedisStorage(Storage):
         items = self.redis_object.lrange(redis_key, 0, -1)
         results = []
         for item_str in items:
-            val_dict = json.loads(want_string(item_str))
+            val_dict = cPickle.loads(item_str)
 
             # Depending on type (sparse or not) reconstruct vector
             if 'sparse' in val_dict:
@@ -115,7 +117,8 @@ class RedisStorage(Storage):
                 vector = scipy.sparse.coo_matrix( (coo_data,(coo_row,coo_col)), shape=(val_dict['dim'],1) )
 
             else:
-                vector = numpy.fromiter(val_dict['vector'], dtype=numpy.float64)
+                vector = numpy.fromstring(val_dict['vector'],
+                                          dtype=val_dict['dtype'])
 
             # Add data to result tuple, if present
             if 'data' in val_dict:
