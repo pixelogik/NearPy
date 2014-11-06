@@ -35,7 +35,6 @@ import pickle
 import cPickle
 
 from nearpy.storage.storage import Storage
-from nearpy.utils import want_string
 
 
 class RedisStorage(Storage):
@@ -93,7 +92,7 @@ class RedisStorage(Storage):
         items = self.redis_object.lrange(redis_key, 0, -1)
         results = []
         for item_str in items:
-            val_dict = cPickle.loads(want_string(item_str))
+            val_dict = cPickle.loads(item_str)
 
             # Depending on type (sparse or not) reconstruct vector
             if 'sparse' in val_dict:
