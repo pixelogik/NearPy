@@ -41,6 +41,11 @@ class TestHashStorage(unittest.TestCase):
                                   port=6379, db=0)
         self.redis_storage = RedisStorage(self.redis_object)
 
+    def test_hash_memory_storage_none_config(self):
+        conf = self.memory.load_hash_configuration('nonexistentHash')
+
+        self.assertIsNone(conf)
+
     def test_hash_memory_storage_rbp(self):
         hash1 = RandomBinaryProjections('testRBPHash', 10)
         hash1.reset(100)
@@ -112,6 +117,11 @@ class TestHashStorage(unittest.TestCase):
             for j in range(hash1.components.shape[1]):
                 self.assertEqual(hash1.components[i, j], hash2.components[i, j])
 
+
+    def test_hash_redis_storage_none_config(self):
+        conf = self.redis_storage.load_hash_configuration('nonexistentHash')
+
+        self.assertIsNone(conf)
 
     def test_hash_redis_storage_rbp(self):
         hash1 = RandomBinaryProjections('testRBPHash', 10)

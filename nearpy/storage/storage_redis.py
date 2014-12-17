@@ -154,5 +154,7 @@ class RedisStorage(Storage):
         """
         Loads and returns hash configuration
         """
-        return pickle.loads(self.redis_object.get(hash_name+'_conf'))
+        conf = self.redis_object.get(hash_name+'_conf')
+
+        return pickle.loads(conf) if conf is not None else None
 
