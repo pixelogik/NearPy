@@ -13,6 +13,7 @@ setup(
         'nearpy.experiments',
         'nearpy.filters',
         'nearpy.hashes',
+        'nearpy.hashes.permutation',
         'nearpy.storage',
         'nearpy.utils'
     ],
