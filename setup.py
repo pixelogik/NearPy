@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='NearPy',
-    version='0.1.3',
+    version='0.2.1',
     author='Ole Krause-Sparmann',
     author_email='ole@pixelogik.de',
     packages=[
