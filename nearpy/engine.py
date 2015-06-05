@@ -27,11 +27,10 @@ import numpy as np
 from nearpy.hashes import RandomBinaryProjections
 from nearpy.hashes import PCABinaryProjections
 from nearpy.hashes import RandomBinaryProjectionTree
-from nearpy.filters import NearestFilter
+from nearpy.filters import NearestFilter, UniqueFilter
 from nearpy.distances import EuclideanDistance
 from nearpy.distances import CosineDistance
 from nearpy.storage import MemoryStorage
-
 
 class Engine(object):
     """
@@ -61,17 +60,22 @@ class Engine(object):
 
     def __init__(self, dim, lshashes=None,
                  distance=None,
+                 fetch_vector_filters=None,
                  vector_filters=None,
                  storage=None):
         """ Keeps the configuration. """
         if lshashes is None: lshashes = [RandomBinaryProjections('default', 10)]
         self.lshashes = lshashes
-        if distance is None: distance = EuclideanDistance()
+        if distance is None: distance = CosineDistance()
         self.distance = distance
         if vector_filters is None: vector_filters = [NearestFilter(10)]
         self.vector_filters = vector_filters
+        if fetch_vector_filters is None: fetch_vector_filters = [UniqueFilter()]
+        self.fetch_vector_filters = fetch_vector_filters
         if storage is None: storage = MemoryStorage()
         self.storage = storage
+
+        print("HAHHAHHA")
 
         # Initialize all hashes for the data space dimension.
         for lshash in self.lshashes:
@@ -83,12 +87,14 @@ class Engine(object):
         The data argument must be JSON-serializable. It is stored with the
         vector and will be returned in search results.
         """
+        # We will store the normalized vector (used during retrieval)
+        nv = v / np.linalg.norm(v)        
         # Store vector in each bucket of all hashes
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v):
                 #print 'Storying in bucket %s one vector' % bucket_key
                 self.storage.store_vector(lshash.hash_name, bucket_key,
-                                          v, data)
+                                          nv, data)
 
 
     def candidate_count(self, v):
@@ -121,7 +127,8 @@ class Engine(object):
         buckets in storage, applys the (optional) distance function and
         finally the (optional) filter function to construct the returned list
         of either (vector, data, distance) tuples or (vector, data) tuples.
-        """
+        """        
+
         # Collect candidates from all buckets from all hashes
         candidates = []
         for lshash in self.lshashes:
@@ -131,11 +138,21 @@ class Engine(object):
                 #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
                 candidates.extend(bucket_content)
 
-        #print 'Candidate count is %d' % len(candidates)
+        # print 'Candidate count is %d' % len(candidates)
 
-        # Apply distance implementation if specified
-        if self.distance:
-            candidates = [(x[0], x[1], self.distance.distance(x[0], v)) for x
+        # Apply fetch vector filters if specified and return filtered list
+        if self.fetch_vector_filters:
+            filter_input = candidates
+            for fetch_vector_filter in self.fetch_vector_filters:
+                filter_input = fetch_vector_filter.filter_vectors(filter_input)
+            # Update candidates
+            candidates = filter_input
+
+        # Apply distance implementation if specified 
+        if self.distance:            
+            # Normalize vector (stored vectors are normalized)
+            nv = v / np.linalg.norm(v)        
+            candidates = [(x[0], x[1], self.distance.distance(x[0], nv)) for x
                             in candidates]
 
         # Apply vector filters if specified and return filtered list
