@@ -75,8 +75,6 @@ class Engine(object):
         if storage is None: storage = MemoryStorage()
         self.storage = storage
 
-        print("HAHHAHHA")
-
         # Initialize all hashes for the data space dimension.
         for lshash in self.lshashes:
             lshash.reset(dim)
