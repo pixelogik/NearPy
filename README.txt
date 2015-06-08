@@ -8,9 +8,6 @@ To install simply do *pip install NearPy*. It will also install the packages sci
 
 Both dense and sparse (scipy.sparse) vectors are supported right now.
 
-The version currently available via pip is not the current master. There have been some updates
-on sparse vector support that need some more evaluation before a new version is released.
-
 Read more here: http://nearpy.io
 
 ## Principle
@@ -35,7 +32,7 @@ Engines are configured using the constructor that accepts the different componen
 
 ```python
 def __init__(self, dim, lshashes=[RandomBinaryProjections('default', 10)],
-             distance=EuclideanDistance(),
+             distance=CosineDistance(),
              vector_filters=[NearestFilter(10)],
              storage=MemoryStorage()):
 ```
@@ -45,10 +42,13 @@ The ANNS pipeline is configured for a fixed dimensionality of the feature space,
 The engine can use multiple LSHs and takes them from the lshashes parameter, that must be an array of
 LSHash objects.
 
-Depending on the kind if filters used during querying a distance measure can be specified. This is only
+Depending on the kind of filters used during querying a distance measure can be specified. This is only
 needed if you use filters that need a distance (like NearestFilter or DistanceThresholdFilter).
 
 Filters are used in a last step during querying nearest neighbours. Existing implementations are NearestFilter, DistanceThresholdFilter and UniqueFilter.
+
+The is another parameter to the engine called fetch_vector_filters, which is performed after fetching candidate vectors from the buckets and before distances
+or vector filters are used. This is by default one UniqueFilter and it should always be. I keep this still as a parameter if people need to play around with that. 
 
 The engine supports different kinds of ways how the indexed vectors (and the buckets) are stored. Current
 storage implementations are MemoryStorage and RedisStorage.
@@ -61,6 +61,7 @@ neighbours(self, v)
 ```
 store_vector() hashes vector v with all configured LSHs and stores it in all matching buckets in the storage.
 The optional data argument must be JSON-serializable. It is stored with the vector and will be returned in search results.
+It is best practice to use only database ids as attached 'data' and store the actual data in a database.
 
 neighbours() hashes vector v with all configured LSHs, collects all candidate vectors from the matching
 buckets in storage, applies the (optional) distance function and finally the (optional) filter function
@@ -81,8 +82,7 @@ constructor and reset methods.
     hash_vector(self, v)
 ```
 
-hash_vector() hashes the specified vector and returns a list of bucket keys, that match the vector.
-Depending on the hash implementation this list can contain one or many bucket keys.
+hash_vector() hashes the specified vector and returns a list of bucket keys with one or more entries.
 
 The LSH RandomBinaryProjections projects the specified vector on n random
 normalized vectors in the feature space and returns a string made from zeros and ones. If v lies on
@@ -105,10 +105,42 @@ the buckets. I do not have any tests on this and don't know if this makes sense 
 The LSH PCADiscretizedProjections is the pca version of RandomDiscretizedProjections, not using random vectors
 but the first n principal components of the training set, like PCABinaryProjections does it.
 
-===========
+## Hash configurations
 
-More docs to come...
+To save your index in Redis and re-use it after the indexing process is done you should persist
+your hash configurations so that afterwards you can re-create the same engine for more indexing
+or querying.
 
+This is done like this:
+
+```python
+# Create redis storage adapter
+redis_object = Redis(host='localhost', port=6379, db=0)
+redis_storage = RedisStorage(redis_object)
+
+# Get hash config from redis
+config = redis_storage.load_hash_configuration('MyHash')
+
+if config is None:
+    # Config is not existing, create hash from scratch, with 10 projections
+    lshash = RandomBinaryProjections('MyHash', 10)
+else:
+    # Config is existing, create hash with None parameters
+    lshash = RandomBinaryProjections(None, None)
+    # Apply configuration loaded from redis
+    lshash.apply_config(config)
+
+# Create engine for feature space of 100 dimensions and use our hash.
+# This will set the dimension of the lshash only the first time, not when
+# using the configuration loaded from redis. Use redis storage to store
+# buckets.
+engine = Engine(100, lshashes=[lshash], storage=redis_storage)
+
+# Do some stuff like indexing or querying with the engine...
+
+# Finally store hash configuration in redis for later use
+redis_storage.store_hash_configuration(lshash)
+```
 ===========
 
 Example usage:

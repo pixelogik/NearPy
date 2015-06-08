@@ -8,9 +8,6 @@ To install simply do *pip install NearPy*. It will also install the packages sci
 
 Both dense and sparse (scipy.sparse) vectors are supported right now.
 
-The version currently available via pip is not the current master. There have been some updates
-on sparse vector support that need some more evaluation before a new version is released.
-
 Read more here: http://nearpy.io
 
 ## Principle
@@ -35,7 +32,7 @@ Engines are configured using the constructor that accepts the different componen
 
 ```python
 def __init__(self, dim, lshashes=[RandomBinaryProjections('default', 10)],
-             distance=EuclideanDistance(),
+             distance=CosineDistance(),
              vector_filters=[NearestFilter(10)],
              storage=MemoryStorage()):
 ```
@@ -49,6 +46,9 @@ Depending on the kind of filters used during querying a distance measure can be 
 needed if you use filters that need a distance (like NearestFilter or DistanceThresholdFilter).
 
 Filters are used in a last step during querying nearest neighbours. Existing implementations are NearestFilter, DistanceThresholdFilter and UniqueFilter.
+
+The is another parameter to the engine called fetch_vector_filters, which is performed after fetching candidate vectors from the buckets and before distances
+or vector filters are used. This is by default one UniqueFilter and it should always be. I keep this still as a parameter if people need to play around with that. 
 
 The engine supports different kinds of ways how the indexed vectors (and the buckets) are stored. Current
 storage implementations are MemoryStorage and RedisStorage.
@@ -141,63 +141,6 @@ engine = Engine(100, lshashes=[lshash], storage=redis_storage)
 # Finally store hash configuration in redis for later use
 redis_storage.store_hash_configuration(lshash)
 ```
-
-## Random binary projection trees
-
-If you always want exactly N results you can use the new hash RandomBinaryProjectionTreeNode.
-
-It performs random binary projections but also constructs a binary tree that is used during
-queries to guarantee a minimum result size.
-
-For example, if you always want exactly 20 results, you combine this with the NearestFilter(20)
-filter. You tell the RandomBinaryProjectionTree that the hash should return keys for buckets
-with a total of at least 20 items, so the bucket retrieval stage will have >=20 items that are
-then filtered by the nearest neighbour filter and clamped to 20:
-
-```python
-# We want 12 projections (good choice for 200000 points in 100 dimensions), 20 results at least
-rbpt = RandomBinaryProjectionTree('testHash', 12, 20)
-
-# Create engine for 100 dimensional feature space, do not forget to set
-# nearest filter to 20, because default is 10
-self.engine = Engine(100, lshashes=[rbpt], vector_filters=[NearestFilter(20)])
-
-# First insert 200000 random vectors
-print 'Indexing...'
-for k in range(200000):
-    x = numpy.random.randn(100)
-    x_data = 'data'
-    self.engine.store_vector(x, x_data)
-
-# Now do random queries and check result set size
-print 'Querying...'
-for k in range(10):
-    x = numpy.random.randn(100)
-    n = self.engine.neighbours(x)
-    print "Candidate count = %d" % self.engine.candidate_count(x)
-    print "Result size = %d" % len(n)
-```
-
-## Candidate count as hash configuration measure
-
-To find out if your hash is configured in a good way you should use the new candidate_count() method
-of the Engine class. This method performs hash generation and bucket retrieval and then returns the count
-of all candidates from all matching buckets. The more candidates the slower the retrieval process is
-because for every candidate the distance to the query vector is computed ( if you use a distance )
-and that list is then filtered by your filter (NearestFilter for example).
-
-To have fast retrieval make sure the average candidate count is not too high with respect to the
-result set size you want to have. For example if the result set size is 20 and the candidate count
-is mostly > 200, you waste a lot of performance. The higher the candidate set is the more exact the
-retrieval is (because it is more likely that candidates are real nearest neighbours) but the slower it gets.
-
-I will soon perform experiments on best practices regarding average candidate count and other hash configuration
-aspects.
-
-===========
-
-More docs to come...
-
 ===========
 
 Example usage:
