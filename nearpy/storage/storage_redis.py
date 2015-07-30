@@ -31,8 +31,10 @@ import redis
 import json
 import numpy
 import scipy
-import pickle
-import cPickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 from nearpy.storage.storage import Storage
 
@@ -82,7 +84,7 @@ class RedisStorage(Storage):
             val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
-        self.redis_object.rpush(redis_key, cPickle.dumps(val_dict, protocol=2))
+        self.redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
 
     def get_bucket(self, hash_name, bucket_key):
         """
@@ -92,7 +94,7 @@ class RedisStorage(Storage):
         items = self.redis_object.lrange(redis_key, 0, -1)
         results = []
         for item_str in items:
-            val_dict = cPickle.loads(item_str)
+            val_dict = pickle.loads(item_str)
 
             # Depending on type (sparse or not) reconstruct vector
             if 'sparse' in val_dict:
@@ -157,4 +159,3 @@ class RedisStorage(Storage):
         conf = self.redis_object.get(hash_name+'_conf')
 
         return pickle.loads(conf) if conf is not None else None
-
