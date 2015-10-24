@@ -46,18 +46,18 @@ class TestVectorFilters(unittest.TestCase):
     def test_thresholding(self):
         result = self.threshold_filter.filter_vectors(self.V)
         self.assertEqual(len(result), 3)
-        self.assertTrue(self.V[0] in result)
-        self.assertTrue(self.V[1] in result)
-        self.assertTrue(self.V[4] in result)
+        self.assertIn(self.V[0], result)
+        self.assertIn(self.V[1], result)
+        self.assertIn(self.V[4], result)
 
     def test_nearest(self):
         result = self.nearest_filter.filter_vectors(self.V)
         self.assertEqual(len(result), 5)
-        self.assertTrue(self.V[0] in result)
-        self.assertTrue(self.V[1] in result)
-        self.assertTrue(self.V[4] in result)
-        self.assertTrue(self.V[2] in result)
-        self.assertTrue(self.V[3] in result)
+        self.assertIn(self.V[0], result)
+        self.assertIn(self.V[1], result)
+        self.assertIn(self.V[4], result)
+        self.assertIn(self.V[2], result)
+        self.assertIn(self.V[3], result)
 
     def test_unique(self):
         W = self.V

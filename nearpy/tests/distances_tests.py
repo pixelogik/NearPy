@@ -30,9 +30,6 @@ from nearpy.distances import EuclideanDistance, CosineDistance, ManhattanDistanc
 
 # Helper functions
 
-def equal_with_tolerance(x, y, tolerance):
-    return x > (y-tolerance) and x < (y+tolerance)
-
 def test_distance_symmetry(test_obj, distance):
     for k in range(100):
         x = numpy.random.randn(10)
@@ -41,7 +38,7 @@ def test_distance_symmetry(test_obj, distance):
         d_yx = distance.distance(y, x)
 
         # I had precision issues with a local install. This test is more tolerant to that.
-        test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.00000000000001))
+        test_obj.assertAlmostEqual(d_xy, d_yx, delta=0.00000000000001)
 
     for k in range(100):
         x = scipy.sparse.rand(30, 1, density=0.3)
@@ -50,7 +47,7 @@ def test_distance_symmetry(test_obj, distance):
         d_yx = distance.distance(y, x)
 
         # I had precision issues with a local install. This test is more tolerant to that.
-        test_obj.assertTrue(equal_with_tolerance(d_xy, d_yx, 0.00000000000001))
+        test_obj.assertAlmostEqual(d_xy, d_yx, delta=0.00000000000001)
 
 def test_distance_triangle_inequality(test_obj, distance):
     for k in range(100):
@@ -62,7 +59,7 @@ def test_distance_triangle_inequality(test_obj, distance):
         d_xz = distance.distance(x, z)
         d_yz = distance.distance(y, z)
 
-        test_obj.assertTrue(d_xy <= d_xz + d_yz)
+        test_obj.assertLessEqual(d_xy, d_xz + d_yz)
 
     for k in range(100):
         x = scipy.sparse.rand(30, 1, density=0.3)
