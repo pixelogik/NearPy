@@ -21,7 +21,6 @@
 # THE SOFTWARE.
 
 import numpy
-import scipy
 import unittest
 import logging
 
@@ -31,16 +30,18 @@ from nearpy.distances import CosineDistance
 from nearpy.hashes import HashPermutations
 from nearpy.hashes import RandomBinaryProjections
 
+
 class TestPermutation(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.WARNING)
+        numpy.random.seed(11)
 
         # Create permutations meta-hash
         self.permutations = HashPermutations('permut')
 
         # Create binary hash as child hash
-        rbp = RandomBinaryProjections('rbp1', 4)
+        rbp = RandomBinaryProjections('rbp1', 4, rand_seed=19)
         rbp_conf = {'num_permutation':50,'beam_size':10,'num_neighbour':100}
 
         # Add rbp as child hash of permutations hash
@@ -66,25 +67,15 @@ class TestPermutation(unittest.TestCase):
         self.permutations.build_permuted_index()
 
         # Do random query on engine with permutations meta-hash
-        print '\nNeighbour distances with permuted index:'
         query = numpy.random.randn(200)
         results = self.engine_perm.neighbours(query)
-        dists = [x[2] for x in results]
-        print dists
+        permuted_dists = [x[2] for x in results]
 
-        # Do random query on engine without permutations meta-hash
-        print '\nNeighbour distances without permuted index (distances should be larger):'
+        # Do random query on engine without permutations meta-hash (distances should be larger):'
         results = self.engine.neighbours(query)
         dists = [x[2] for x in results]
-        print dists
 
-        # Real neighbours
-        print '\nReal neighbour distances:'
-        query = query.reshape((1,200))
-        dists = CosineDistance().distance_matrix(matrix,query)
-        dists = dists.reshape((-1,))
-        dists = sorted(dists)
-        print dists[:10]
+        self.assertLess(permuted_dists[0], dists[0])
 
 if __name__ == '__main__':
     unittest.main()
