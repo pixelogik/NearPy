@@ -28,21 +28,24 @@ from nearpy.experiments import RecallPrecisionExperiment
 from nearpy.hashes import UniBucket, RandomDiscretizedProjections, \
     RandomBinaryProjections, PCABinaryProjections
 from nearpy.filters import NearestFilter, UniqueFilter
-from nearpy.distances import CosineDistance
+from nearpy.distances import CosineDistance, EuclideanDistance
 
 from nearpy import Engine
 
 
 class TestRecallExperiment(unittest.TestCase):
+    def setUp(self):
+        numpy.random.seed(4)
 
     def test_experiment_with_unibucket_1(self):
         dim = 50
         vector_count = 100
         vectors = numpy.random.randn(dim, vector_count)
         unibucket = UniBucket('testHash')
-        nearest = NearestFilter(10)
+        nearest = NearestFilter(10 + 1)
         engine = Engine(dim, lshashes=[unibucket],
-                        vector_filters=[nearest])
+                        vector_filters=[nearest],
+                        distance=EuclideanDistance())
         exp = RecallPrecisionExperiment(10, vectors)
         result = exp.perform_experiment([engine])
 
@@ -55,7 +58,7 @@ class TestRecallExperiment(unittest.TestCase):
         vector_count = 100
         vectors = numpy.random.randn(dim, vector_count)
         unibucket = UniBucket('testHash')
-        nearest = NearestFilter(10)
+        nearest = NearestFilter(10 + 1)
         engine = Engine(dim, lshashes=[unibucket],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(5, vectors)
@@ -72,7 +75,7 @@ class TestRecallExperiment(unittest.TestCase):
         vector_count = 100
         vectors = numpy.random.randn(dim, vector_count)
         unibucket = UniBucket('testHash')
-        nearest = NearestFilter(5)
+        nearest = NearestFilter(5 + 1)
         engine = Engine(dim, lshashes=[unibucket],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(10, vectors)
@@ -91,7 +94,7 @@ class TestRecallExperiment(unittest.TestCase):
         for index in range(vector_count):
             vectors.append(numpy.random.randn(dim))
         unibucket = UniBucket('testHash')
-        nearest = NearestFilter(10)
+        nearest = NearestFilter(10 + 1)
         engine = Engine(dim, lshashes=[unibucket],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(10, vectors)
@@ -108,7 +111,7 @@ class TestRecallExperiment(unittest.TestCase):
         for index in range(vector_count):
             vectors.append(numpy.random.randn(dim))
         unibucket = UniBucket('testHash')
-        nearest = NearestFilter(10)
+        nearest = NearestFilter(10 + 1)
         engine = Engine(dim, lshashes=[unibucket],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(5, vectors)
@@ -127,7 +130,7 @@ class TestRecallExperiment(unittest.TestCase):
         for index in range(vector_count):
             vectors.append(numpy.random.randn(dim))
         unibucket = UniBucket('testHash')
-        nearest = NearestFilter(5)
+        nearest = NearestFilter(5 + 1)
         engine = Engine(dim, lshashes=[unibucket],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(10, vectors)
@@ -146,7 +149,7 @@ class TestRecallExperiment(unittest.TestCase):
 
         # First get recall and precision for one 1-dim random hash
         rdp = RandomDiscretizedProjections('rdp', 1, 0.01)
-        nearest = NearestFilter(10)
+        nearest = NearestFilter(10 + 1)
         engine = Engine(dim, lshashes=[rdp],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(10, vectors)
@@ -183,7 +186,7 @@ class TestRecallExperiment(unittest.TestCase):
 
         # First get recall and precision for one 1-dim random hash
         rbp = RandomBinaryProjections('rbp', 32)
-        nearest = NearestFilter(10)
+        nearest = NearestFilter(10 + 1)
         engine = Engine(dim, lshashes=[rbp],
                         vector_filters=[nearest])
         exp = RecallPrecisionExperiment(10, vectors)
