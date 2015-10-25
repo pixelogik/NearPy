@@ -47,7 +47,7 @@ class TestRandomBinaryProjectionTree(unittest.TestCase):
         self.engine = Engine(100, lshashes=[rbpt], vector_filters=[NearestFilter(20)])
 
         # First insert 200000 random vectors
-        for k in range(40):
+        for k in range(200000):
             x = numpy.random.randn(100)
             x_data = 'data {}'.format(k)
             self.engine.store_vector(x, x_data)
