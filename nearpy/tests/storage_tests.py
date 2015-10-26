@@ -24,7 +24,7 @@ import numpy
 import scipy
 import unittest
 
-from redis import Redis
+from mockredis import MockRedis as Redis
 
 from nearpy.storage import MemoryStorage, RedisStorage
 
@@ -33,8 +33,7 @@ class TestStorage(unittest.TestCase):
 
     def setUp(self):
         self.memory = MemoryStorage()
-        self.redis_object = Redis(host='localhost',
-                                  port=6379, db=0)
+        self.redis_object = Redis()
         self.redis_storage = RedisStorage(self.redis_object)
 
     def test_memory_storage(self):

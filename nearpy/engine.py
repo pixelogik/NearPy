@@ -31,6 +31,8 @@ from nearpy.filters import NearestFilter, UniqueFilter
 from nearpy.distances import EuclideanDistance
 from nearpy.distances import CosineDistance
 from nearpy.storage import MemoryStorage
+from nearpy.utils.utils import unitvec
+
 
 class Engine(object):
     """
@@ -86,7 +88,7 @@ class Engine(object):
         vector and will be returned in search results.
         """
         # We will store the normalized vector (used during retrieval)
-        nv = v / np.linalg.norm(v)        
+        nv = unitvec(v)
         # Store vector in each bucket of all hashes
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v):
@@ -149,7 +151,7 @@ class Engine(object):
         # Apply distance implementation if specified 
         if self.distance:            
             # Normalize vector (stored vectors are normalized)
-            nv = v / np.linalg.norm(v)        
+            nv = unitvec(v)
             candidates = [(x[0], x[1], self.distance.distance(x[0], nv)) for x
                             in candidates]
 

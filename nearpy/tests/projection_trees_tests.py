@@ -21,23 +21,21 @@
 # THE SOFTWARE.
 
 import numpy
-import scipy
 import unittest
-import json
 
 from nearpy import Engine
 from nearpy.filters import NearestFilter
 from nearpy.hashes import RandomBinaryProjectionTree
 
-from redis import Redis
+from mockredis import MockRedis as Redis
 from nearpy.storage import MemoryStorage, RedisStorage
+
 
 class TestRandomBinaryProjectionTree(unittest.TestCase):
 
     def setUp(self):
         self.memory = MemoryStorage()
-        self.redis_object = Redis(host='localhost',
-                                  port=6379, db=0)
+        self.redis_object = Redis()
         self.redis_storage = RedisStorage(self.redis_object)
 
     def test_retrieval(self):
@@ -49,19 +47,15 @@ class TestRandomBinaryProjectionTree(unittest.TestCase):
         self.engine = Engine(100, lshashes=[rbpt], vector_filters=[NearestFilter(20)])
 
         # First insert 200000 random vectors
-        #print 'Indexing...'
         for k in range(200000):
             x = numpy.random.randn(100)
-            x_data = 'data'
+            x_data = 'data {}'.format(k)
             self.engine.store_vector(x, x_data)
 
         # Now do random queries and check result set size
-        #print 'Querying...'
         for k in range(10):
             x = numpy.random.randn(100)
             n = self.engine.neighbours(x)
-            #print "Candidate count = %d" % self.engine.candidate_count(x)
-            #print "Result size = %d" % len(n)
             self.assertEqual(len(n), 20)
 
     def test_storage_memory(self):

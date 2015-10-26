@@ -25,6 +25,7 @@ import scipy
 import unittest
 
 from nearpy import Engine
+from nearpy.utils.utils import unitvec
 
 
 class TestEngine(unittest.TestCase):
@@ -51,12 +52,12 @@ class TestEngine(unittest.TestCase):
             x_data = 'data'
             self.engine.store_vector(x, x_data)
             n = self.engine.neighbours(x)
-            y = n[0][0]
-            y_data = n[0][1]
-            y_distance = n[0][2]
-            self.assertTrue((y == x).all())
+            y, y_data, y_distance  = n[0]
+            normalized_x = unitvec(x)
+            delta = 0.000000001
+            self.assertAlmostEqual(numpy.abs((normalized_x - y)).max(), 0, delta=delta)
             self.assertEqual(y_data, x_data)
-            self.assertEqual(y_distance, 0.0)
+            self.assertAlmostEqual(y_distance, 0.0, delta=delta)
 
     def test_retrieval_sparse(self):
         for k in range(100):
@@ -65,12 +66,12 @@ class TestEngine(unittest.TestCase):
             x_data = 'data'
             self.engine.store_vector(x, x_data)
             n = self.engine.neighbours(x)
-            y = n[0][0]
-            y_data = n[0][1]
-            y_distance = n[0][2]
-            self.assertTrue((y - x).sum() == 0.0)
+            y, y_data, y_distance = n[0]
+            normalized_x = unitvec(x)
+            delta = 0.000000001
+            self.assertAlmostEqual(numpy.abs((normalized_x - y)).max(), 0, delta=delta)
             self.assertEqual(y_data, x_data)
-            self.assertEqual(y_distance, 0.0)
+            self.assertAlmostEqual(y_distance, 0.0, delta=delta)
 
 if __name__ == '__main__':
     unittest.main()

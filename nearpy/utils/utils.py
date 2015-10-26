@@ -22,7 +22,7 @@
 
 import sys
 import numpy
-
+import scipy
 
 
 def numpy_array_from_list_or_numpy_array(vectors):
@@ -41,6 +41,28 @@ def numpy_array_from_list_or_numpy_array(vectors):
         return V
 
     return vectors
+
+
+def unitvec(vec):
+    """
+    Scale a vector to unit length. The only exception is the zero vector, which
+    is returned back unchanged.
+    """
+    if scipy.sparse.issparse(vec): # convert scipy.sparse to standard numpy array
+        vec = vec.tocsr()
+        veclen = numpy.sqrt(numpy.sum(vec.data ** 2))
+        if veclen > 0.0:
+            return vec / veclen
+        else:
+            return vec
+
+    if isinstance(vec, numpy.ndarray):
+        vec = numpy.asarray(vec, dtype=float)
+        veclen = numpy.linalg.norm(vec)
+        if veclen > 0.0:
+            return vec / veclen
+        else:
+            return vec
 
 
 def perform_pca(A):

@@ -24,11 +24,11 @@ from __future__ import print_function
 import numpy
 import scipy
 import time
-import sys
 
 from scipy.spatial.distance import cdist
 
 from nearpy.utils import numpy_array_from_list_or_numpy_array
+from nearpy.utils.utils import unitvec
 
 
 class RecallPrecisionExperiment(object):
@@ -62,27 +62,23 @@ class RecallPrecisionExperiment(object):
         self.vector_dict = {}
         self.N = N
         self.coverage_ratio = coverage_ratio
+        numpy_vectors = numpy_array_from_list_or_numpy_array(vectors)
 
         # Get numpy array representation of input
-        self.vectors = numpy_array_from_list_or_numpy_array(vectors)
+        self.vectors = numpy.vstack([unitvec(v) for v in numpy_vectors.T])
 
         # Build map from vector string representation to vector
-        for index in range(self.vectors.shape[1]):
-            self.vector_dict[self.__vector_to_string(
-                self.vectors[:, index])] = index
-
-        # Get transposed version of vector matrix, so that the rows
-        # are the vectors (needed by cdist)
-        vectors_t = numpy.transpose(self.vectors)
+        for index, v in enumerate(self.vectors):
+            self.vector_dict[self.__vector_to_string(v)] = index
 
         # Determine the indices of query vectors used for comparance
         # with approximated search.
         query_count = numpy.floor(self.coverage_ratio *
-                                  self.vectors.shape[1])
+                                  len(self.vectors))
         self.query_indices = []
         for k in range(int(query_count)):
-            index = numpy.floor(k*(self.vectors.shape[1]/query_count))
-            index = min(index, self.vectors.shape[1]-1)
+            index = numpy.floor(k * (float(len(self.vectors)) / query_count))
+            index = min(index, len(self.vectors) - 1)
             self.query_indices.append(int(index))
 
         print('\nStarting exact search (query set size=%d)...\n' % query_count)
@@ -92,17 +88,16 @@ class RecallPrecisionExperiment(object):
         self.exact_search_time_per_vector = 0.0
 
         for index in self.query_indices:
-
-            v = vectors_t[index, :].reshape(1, self.vectors.shape[0])
+            v = self.vectors[index, numpy.newaxis]
             exact_search_start_time = time.time()
-            D = cdist(v, vectors_t, 'euclidean')
+            D = cdist(v, self.vectors, 'euclidean')
             self.closest[index] = scipy.argsort(D)[0, 1:N+1]
 
             # Save time needed for exact search
             exact_search_time = time.time() - exact_search_start_time
             self.exact_search_time_per_vector += exact_search_time
 
-        print('\Done with exact search...\n')
+        print('Done with exact search...\n')
 
         # Normalize search time
         self.exact_search_time_per_vector /= float(len(self.query_indices))
@@ -121,9 +116,8 @@ class RecallPrecisionExperiment(object):
         result = []
 
         # For each engine, first index vectors and then retrieve neighbours
-        for engine in engine_list:
-            print('Engine %d / %d' % (engine_list.index(engine),
-                                      len(engine_list)))
+        for endine_idx, engine in enumerate(engine_list):
+            print('Engine %d / %d' % (endine_idx, len(engine_list)))
 
             # Clean storage
             engine.clean_all_buckets()
@@ -135,9 +129,8 @@ class RecallPrecisionExperiment(object):
             avg_search_time = 0.0
 
             # Index all vectors and store them
-            for index in range(self.vectors.shape[1]):
-                engine.store_vector(self.vectors[:, index],
-                                    'data_%d' % index)
+            for index, v in enumerate(self.vectors):
+                engine.store_vector(v, 'data_%d' % index)
 
             # Look for N nearest neighbours for query vectors
             for index in self.query_indices:
@@ -148,7 +141,7 @@ class RecallPrecisionExperiment(object):
                 search_time_start = time.time()
 
                 # Get nearest N according to engine
-                nearest = engine.neighbours(self.vectors[:, index])
+                nearest = engine.neighbours(self.vectors[index])
 
                 # Get search time
                 search_time = time.time() - search_time_start
@@ -168,8 +161,7 @@ class RecallPrecisionExperiment(object):
                     precision = 0.0
                 else:
                     # Get intersection count
-                    inter_count = float(len(real_nearest.intersection(
-                        nearest)))
+                    inter_count = float(len(real_nearest & nearest))
 
                     # Normalize recall for this vector
                     recall = inter_count/float(len(real_nearest))
@@ -187,10 +179,10 @@ class RecallPrecisionExperiment(object):
                 avg_search_time += search_time
 
             # Normalize recall over query set
-            avg_recall = avg_recall / float(len(self.query_indices))
+            avg_recall /= float(len(self.query_indices))
 
             # Normalize precision over query set
-            avg_precision = avg_precision / float(len(self.query_indices))
+            avg_precision /= float(len(self.query_indices))
 
             # Normalize search time over query set
             avg_search_time = avg_search_time / float(len(self.query_indices))
@@ -209,7 +201,7 @@ class RecallPrecisionExperiment(object):
 
     def __vector_to_string(self, vector):
         """ Returns string representation of vector. """
-        return numpy.array_str(vector)
+        return numpy.array_str(numpy.round(unitvec(vector), decimals=3))
 
     def __index_of_vector(self, vector):
         """ Returns index of specified vector from test data set. """

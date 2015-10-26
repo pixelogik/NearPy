@@ -24,7 +24,7 @@ setup(
     install_requires=[
         "numpy",
         "scipy",
-        "redis",
-        "bitarray"
+        "bitarray",
+        'mockredispy'
     ],
 )
