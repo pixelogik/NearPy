@@ -25,6 +25,6 @@ setup(
         "numpy",
         "scipy",
         "bitarray",
-        'mockredispy'
+        "future",
     ],
 )

@@ -25,6 +25,7 @@ import random
 #from bitarray import bitarray
 from bisect import bisect_left
 
+from past.builtins import xrange
 
 class Permute:
 
@@ -38,7 +39,7 @@ class Permute:
         """
         Init a Permute object. Randomly generate a mapping, e.g. [0,1,2] -> [1,0,2]
         """
-        m = range(n)
+        m = list(range(n))
         for end in xrange(n - 1, 0, -1):
             r = random.randint(0, end)
             tmp = m[end]
@@ -78,8 +79,9 @@ class Permute:
         # binary search (pba,ba) in bas
         idx = bisect_left(bas, (pba, ba))
 
-        start = max(0, idx - half_beam)
-        end = min(len(bas), idx + half_beam)
+        start = int(max(0, idx - half_beam))
+        end = int(min(len(bas), idx + half_beam))
+
         res = bas[start:end]
 
         # return the original(unpermuted) keys
