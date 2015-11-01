@@ -30,6 +30,8 @@ from nearpy.distances import CosineDistance
 from nearpy.hashes import HashPermutations
 from nearpy.hashes import RandomBinaryProjections
 
+from past.builtins import xrange
+
 
 class TestPermutation(unittest.TestCase):
 
