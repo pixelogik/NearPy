@@ -1,6 +1,24 @@
 #!/usr/bin/env python
+from setuptools import setup, Command
 
-from setuptools import setup
+
+class RunTests(Command):
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import subprocess
+        import sys
+
+        errno = subprocess.call(['py.test'])
+        raise SystemExit(errno)
+
 
 setup(
     name='NearPy',
@@ -27,4 +45,12 @@ setup(
         "bitarray",
         "future",
     ],
+    tests_require=[
+        "pytest",
+        "redis",
+        "mockredispy",
+    ],
+    cmdclass = {
+        'test': RunTests
+    },
 )
