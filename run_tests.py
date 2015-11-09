@@ -1,7 +1,9 @@
+#! /usr/bin/env python
+import subprocess
 
-import unittest
+def main():
+    errno = subprocess.call(['py.test'])
+    raise SystemExit(errno)
 
-import nearpy.tests as tests
-
-suite = unittest.TestLoader().loadTestsFromModule(tests)
-unittest.TextTestRunner(verbosity=2).run(suite)
+if __name__ == '__main__':
+    main()
