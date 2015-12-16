@@ -25,7 +25,10 @@ import random
 #from bitarray import bitarray
 from bisect import bisect_left
 
-from past.builtins import xrange
+try:
+    from past.builtins import xrange
+except ImportError:
+    xrange = range
 
 class Permute:
 

@@ -26,7 +26,10 @@ from bitarray import bitarray as _bitarray
 
 from nearpy.hashes.permutation.permute import Permute
 
-from past.builtins import xrange
+try:
+    from past.builtins import xrange
+except ImportError:
+    xrange = range
 
 
 class bitarray(_bitarray):

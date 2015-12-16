@@ -132,7 +132,7 @@ def example1():
     # Real neighbours
     print '\nReal neighbour distances:'
     query = query.reshape((1,DIM))
-    dists = CosineDistance().distance_matrix(matrix,query)
+    dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
     print dists[:10]
