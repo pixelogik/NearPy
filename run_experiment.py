@@ -15,17 +15,18 @@ vector_count = 100000
 vectors = []
 
 center = numpy.random.randn(dimension)
-for index in range(vector_count/2):
+for index in xrange(vector_count/2):
     vector = center + 0.01 * numpy.random.randn(dimension)
     vectors.append(vector)
 
 center = numpy.random.randn(dimension)
-for index in range(vector_count/2):
+for index in xrange(vector_count/2):
     vector = center + 0.01 * numpy.random.randn(dimension)
     vectors.append(vector)
 
-# We are looking for the ten closest neighbours
-nearest = NearestFilter(20)
+# We are looking for the N closest neighbours
+N = 20
+nearest = NearestFilter(N)
 
 # We will fill this array with all the engines we want to test
 engines = []
@@ -57,7 +58,7 @@ print 'Creating experiment and performing exact search...'
 # Create experiment (looking for ten closest neighbours).
 # The constructor performs exact search for evaluation.
 # So the data set should not be too large for experiments.
-exp = DistanceRatioExperiment(20, vectors, coverage_ratio=0.01)
+exp = DistanceRatioExperiment(N, vectors, coverage_ratio=0.01)
 
 print 'Performing experiment for all engines...'
 

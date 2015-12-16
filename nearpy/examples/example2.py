@@ -81,8 +81,8 @@ def example2():
 
     # Real neighbours
     print '\nReal neighbour distances:'
-    query = query.reshape((1,DIM))
-    dists = CosineDistance().distance_matrix(matrix,query)
+    query = query.reshape((DIM))
+    dists = CosineDistance().distance(matrix, query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
     print dists[:10]
@@ -126,8 +126,8 @@ def example2():
 
     # Real neighbours
     print '\nReal neighbour distances:'
-    query = query.reshape((1,DIM))
-    dists = CosineDistance().distance_matrix(matrix,query)
+    query = query.reshape((DIM))
+    dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
     print dists[:10]
@@ -166,8 +166,8 @@ def example2():
 
     # Real neighbours
     print '\nReal neighbour distances:'
-    query = query.reshape((1,DIM))
-    dists = CosineDistance().distance_matrix(matrix,query)
+    query = query.reshape((DIM))
+    dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
     print dists[:10]
