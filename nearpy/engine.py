@@ -111,14 +111,7 @@ class Engine(object):
         has less entries (increase projection count for example).
         """
         # Collect candidates from all buckets from all hashes
-        candidates = []
-        for lshash in self.lshashes:
-            for bucket_key in lshash.hash_vector(v, querying=True):
-                bucket_content = self.storage.get_bucket(lshash.hash_name,
-                                                         bucket_key)
-                #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
-                candidates.extend(bucket_content)
-
+        candidates = self._get_candidates()
         return len(candidates)
 
     def neighbours(self, v):
@@ -127,9 +120,30 @@ class Engine(object):
         buckets in storage, applys the (optional) distance function and
         finally the (optional) filter function to construct the returned list
         of either (vector, data, distance) tuples or (vector, data) tuples.
-        """        
+        """
 
         # Collect candidates from all buckets from all hashes
+        candidates = self._get_candidates(v)
+        # print 'Candidate count is %d' % len(candidates)
+
+        # Apply fetch vector filters if specified and return filtered list
+        if self.fetch_vector_filters:
+            candidates = self._apply_filter(self.fetch_vector_filters, candidates)
+
+        # Apply distance implementation if specified
+        if self.distance:
+            candidates = self._append_distances(v, self.distance, candidates)
+
+        # Apply vector filters if specified and return filtered list
+        if self.vector_filters:
+            candidates = self._apply_filter(self.vector_filters, candidates)
+
+        # If there is no vector filter, just return list of candidates
+        return candidates
+
+
+    def _get_candidates(self, v):
+        """ Collect candidates from all buckets from all hashes """
         candidates = []
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v, querying=True):
@@ -137,33 +151,28 @@ class Engine(object):
                                                          bucket_key)
                 #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
                 candidates.extend(bucket_content)
+        return candidates
 
-        # print 'Candidate count is %d' % len(candidates)
 
-        # Apply fetch vector filters if specified and return filtered list
-        if self.fetch_vector_filters:
+    def _apply_filter(self, filters, candidates):
+        """ Apply vector filters if specified and return filtered list """
+        if filters:
             filter_input = candidates
-            for fetch_vector_filter in self.fetch_vector_filters:
+            for fetch_vector_filter in filters:
                 filter_input = fetch_vector_filter.filter_vectors(filter_input)
-            # Update candidates
-            candidates = filter_input
 
-        # Apply distance implementation if specified 
-        if self.distance:            
+            return filter_input
+        else:
+            return candidates
+
+    def _append_distances(self, v, distance, candidates):
+        """ Apply distance implementation if specified """
+        if distance:
             # Normalize vector (stored vectors are normalized)
             nv = unitvec(v)
             candidates = [(x[0], x[1], self.distance.distance(x[0], nv)) for x
                             in candidates]
 
-        # Apply vector filters if specified and return filtered list
-        if self.vector_filters:
-            filter_input = candidates
-            for vector_filter in self.vector_filters:
-                filter_input = vector_filter.filter_vectors(filter_input)
-            # Return output of last filter
-            return filter_input
-
-        # If there is no vector filter, just return list of candidates
         return candidates
 
     def clean_all_buckets(self):
