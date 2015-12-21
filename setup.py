@@ -7,7 +7,7 @@ setup_requires = ['pytest-runner>=2.0,<3.0'] if needs_pytest else []
 
 setup(
     name='NearPy',
-    version='0.2.2',
+    version='0.2.3',
     author='Ole Krause-Sparmann',
     author_email='ole@pixelogik.de',
     packages=[
