@@ -40,7 +40,7 @@ def example2():
 
     ##########################################################
 
-    print 'Performing indexing with HashPermutations...'
+    print('Performing indexing with HashPermutations...')
     t0 = time.time()
 
     # Create permutations meta-hash
@@ -58,7 +58,7 @@ def example2():
 
     # First index some random vectors
     matrix = numpy.zeros((POINTS,DIM))
-    for i in xrange(POINTS):
+    for i in range(POINTS):
         v = numpy.random.randn(DIM)
         matrix[i] = v
         engine_perm.store_vector(v)
@@ -67,29 +67,29 @@ def example2():
     permutations.build_permuted_index()
 
     t1 = time.time()
-    print 'Indexing took %f seconds' % (t1-t0)
+    print('Indexing took %f seconds' % (t1-t0))
 
     # Get random query vector
     query = numpy.random.randn(DIM)
 
     # Do random query on engine 3
-    print '\nNeighbour distances with HashPermutations:'
-    print '  -> Candidate count is %d' % engine_perm.candidate_count(query)
+    print('\nNeighbour distances with HashPermutations:')
+    print('  -> Candidate count is %d' % engine_perm.candidate_count(query))
     results = engine_perm.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Real neighbours
-    print '\nReal neighbour distances:'
+    print('\nReal neighbour distances:')
     query = query.reshape((DIM))
     dists = CosineDistance().distance(matrix, query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
-    print dists[:10]
+    print(dists[:10])
 
     ##########################################################
 
-    print '\nPerforming indexing with HashPermutationMapper...'
+    print('\nPerforming indexing with HashPermutationMapper...')
     t0 = time.time()
 
     # Create permutations meta-hash
@@ -106,35 +106,35 @@ def example2():
 
     # First index some random vectors
     matrix = numpy.zeros((POINTS,DIM))
-    for i in xrange(POINTS):
+    for i in range(POINTS):
         v = numpy.random.randn(DIM)
         matrix[i] = v
         engine_perm2.store_vector(v)
 
     t1 = time.time()
-    print 'Indexing took %f seconds' % (t1-t0)
+    print('Indexing took %f seconds' % (t1-t0))
 
     # Get random query vector
     query = numpy.random.randn(DIM)
 
     # Do random query on engine 4
-    print '\nNeighbour distances with HashPermutationMapper:'
-    print '  -> Candidate count is %d' % engine_perm2.candidate_count(query)
+    print('\nNeighbour distances with HashPermutationMapper:')
+    print('  -> Candidate count is %d' % engine_perm2.candidate_count(query))
     results = engine_perm2.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Real neighbours
-    print '\nReal neighbour distances:'
+    print('\nReal neighbour distances:')
     query = query.reshape((DIM))
     dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
-    print dists[:10]
+    print(dists[:10])
 
     ##########################################################
 
-    print '\nPerforming indexing with mutliple binary hashes...'
+    print('\nPerforming indexing with multiple binary hashes...')
     t0 = time.time()
 
     hashes = []
@@ -146,30 +146,30 @@ def example2():
 
     # First index some random vectors
     matrix = numpy.zeros((POINTS,DIM))
-    for i in xrange(POINTS):
+    for i in range(POINTS):
         v = numpy.random.randn(DIM)
         matrix[i] = v
         engine_rbps.store_vector(v)
 
     t1 = time.time()
-    print 'Indexing took %f seconds' % (t1-t0)
+    print('Indexing took %f seconds' % (t1-t0))
 
     # Get random query vector
     query = numpy.random.randn(DIM)
 
     # Do random query on engine 4
-    print '\nNeighbour distances with mutliple binary hashes:'
-    print '  -> Candidate count is %d' % engine_rbps.candidate_count(query)
+    print('\nNeighbour distances with multiple binary hashes:')
+    print('  -> Candidate count is %d' % engine_rbps.candidate_count(query))
     results = engine_rbps.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Real neighbours
-    print '\nReal neighbour distances:'
+    print('\nReal neighbour distances:')
     query = query.reshape((DIM))
     dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
-    print dists[:10]
+    print(dists[:10])
 
     ##########################################################
