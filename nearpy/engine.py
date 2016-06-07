@@ -111,7 +111,7 @@ class Engine(object):
         has less entries (increase projection count for example).
         """
         # Collect candidates from all buckets from all hashes
-        candidates = self._get_candidates()
+        candidates = self._get_candidates(v)
         return len(candidates)
 
     def neighbours(self, v):

@@ -37,7 +37,7 @@ def example1():
     # Number of data points (dont do too much because of exact search)
     POINTS = 10000
 
-    print 'Creating engines'
+    print('Creating engines')
 
     # We want 12 projections, 20 results at least
     rbpt = RandomBinaryProjectionTree('rbpt', 20, 20)
@@ -76,7 +76,7 @@ def example1():
     # Create engine 3
     engine_perm2 = Engine(DIM, lshashes=[permutations2], distance=CosineDistance())
 
-    print 'Indexing %d random vectors of dimension %d' % (POINTS, DIM)
+    print('Indexing %d random vectors of dimension %d' % (POINTS, DIM))
 
     # First index some random vectors
     matrix = numpy.zeros((POINTS,DIM))
@@ -88,53 +88,53 @@ def example1():
         engine_perm.store_vector(v)
         engine_perm2.store_vector(v)
 
-    print 'Buckets 1 = %d' % len(engine.storage.buckets['rbp1'].keys())
-    print 'Buckets 2 = %d' % len(engine_rbpt.storage.buckets['rbpt'].keys())
+    print('Buckets 1 = %d' % len(engine.storage.buckets['rbp1'].keys()))
+    print('Buckets 2 = %d' % len(engine_rbpt.storage.buckets['rbpt'].keys()))
 
-    print 'Building permuted index for HashPermutations'
+    print('Building permuted index for HashPermutations')
 
     # Then update permuted index
     permutations.build_permuted_index()
 
-    print 'Generate random data'
+    print('Generate random data')
 
     # Get random query vector
     query = numpy.random.randn(DIM)
 
     # Do random query on engine 1
-    print '\nNeighbour distances with RandomBinaryProjectionTree:'
-    print '  -> Candidate count is %d' % engine_rbpt.candidate_count(query)
+    print('\nNeighbour distances with RandomBinaryProjectionTree:')
+    print('  -> Candidate count is %d' % engine_rbpt.candidate_count(query))
     results = engine_rbpt.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Do random query on engine 2
-    print '\nNeighbour distances with RandomBinaryProjections:'
-    print '  -> Candidate count is %d' % engine.candidate_count(query)
+    print('\nNeighbour distances with RandomBinaryProjections:')
+    print('  -> Candidate count is %d' % engine.candidate_count(query))
     results = engine.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Do random query on engine 3
-    print '\nNeighbour distances with HashPermutations:'
-    print '  -> Candidate count is %d' % engine_perm.candidate_count(query)
+    print('\nNeighbour distances with HashPermutations:')
+    print('  -> Candidate count is %d' % engine_perm.candidate_count(query))
     results = engine_perm.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Do random query on engine 4
-    print '\nNeighbour distances with HashPermutations2:'
-    print '  -> Candidate count is %d' % engine_perm2.candidate_count(query)
+    print('\nNeighbour distances with HashPermutations2:')
+    print('  -> Candidate count is %d' % engine_perm2.candidate_count(query))
     results = engine_perm2.neighbours(query)
     dists = [x[2] for x in results]
-    print dists
+    print(dists)
 
     # Real neighbours
-    print '\nReal neighbour distances:'
+    print('\nReal neighbour distances:')
     query = query.reshape((1,DIM))
     dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
     dists = sorted(dists)
-    print dists[:10]
+    print(dists[:10])
 
 
