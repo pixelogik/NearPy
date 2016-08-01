@@ -49,6 +49,13 @@ class MemoryStorage(Storage):
             self.buckets[hash_name][bucket_key] = []
         self.buckets[hash_name][bucket_key].append((v, data))
 
+    def delete_vector(self, hash_name, data):
+        """
+        Deletes vector and JSON-serializable data in bucket with specified key.
+        """
+        for bucket_key in self.buckets[hash_name]:
+            self.buckets[hash_name][bucket_key] = [(v, id) for v, id in self.buckets[hash_name][bucket_key] if id != data]
+
     def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
