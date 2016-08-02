@@ -49,6 +49,13 @@ class MemoryStorage(Storage):
             self.buckets[hash_name][bucket_key] = []
         self.buckets[hash_name][bucket_key].append((v, data))
 
+    def delete_vector(self, hash_name, data):
+        """
+        Deletes vector and JSON-serializable data in bucket with specified key.
+        """
+        for bucket_key in self.buckets[hash_name]:
+            self.buckets[hash_name][bucket_key] = [(v, id_data) for v, id_data in self.buckets[hash_name][bucket_key] if id_data != data]
+
     def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
@@ -81,4 +88,3 @@ class MemoryStorage(Storage):
         Loads and returns hash configuration
         """
         return self.hash_configs.get(hash_name)
-
