@@ -199,5 +199,69 @@ class TestRecallExperiment(unittest.TestCase):
         print('\nRecall RBP: %f, Precision RBP: %f, SearchTime RBP: %f\n' % \
             (recall1, precision1, searchtime1))
 
+    def test_delete_vector(self):
+        # test case for 1 hash
+        dim = 5
+        rbp = RandomBinaryProjections('rbp', 10)
+        engine = Engine(dim, lshashes=[rbp])
+        # Index 20 random vectors (set their data to a unique string)
+        for index in range(20):
+            v = numpy.random.randn(dim)
+            engine.store_vector(v, index)
+        # Create random query vector
+        keys = set()
+        for lshash in engine.lshashes:
+            for value in engine.storage.buckets[lshash.hash_name].iteritems():
+                [keys.add(id) for v, id in value[1]]
+
+        self.assertEqual(len(keys), 20)
+
+        engine.delete_vector(15) #delete the vector with key = 15
+
+        new_keys = set()
+        for lshash in engine.lshashes:
+            for value in engine.storage.buckets[lshash.hash_name].iteritems():
+                [new_keys.add(id) for v, id in value[1]]
+
+        self.assertTrue(len(keys) > len(new_keys))
+        self.assertEqual(len(new_keys), 19) #new keys has 19 elements instead of 20
+
+        self.assertTrue(15 in keys)
+        self.assertFalse(15 in new_keys) # the key 15 is the one missing
+
+    def test_delete_vector2(self):
+        # test case for several hashes
+        dim = 5
+        hashes = []
+        for k in xrange(10): # 10 hashes
+            nearpy_rbp = RandomBinaryProjections('rbp_%d' % k, 10)
+            hashes.append(nearpy_rbp)
+        engine = Engine(dim, lshashes=hashes)
+        # Index 20 random vectors (set their data to a unique string)
+        for index in range(20):
+            v = numpy.random.randn(dim)
+            engine.store_vector(v, index)
+        # Create random query vector
+        keys = set()
+        for lshash in engine.lshashes:
+            for value in engine.storage.buckets[lshash.hash_name].iteritems():
+                [keys.add(id) for v, id in value[1]]
+
+        self.assertEqual(len(keys), 20)
+
+        engine.delete_vector(15) #delete the vector with key = 15
+
+        new_keys = set()
+        for lshash in engine.lshashes:
+            for value in engine.storage.buckets[lshash.hash_name].iteritems():
+                [new_keys.add(id) for v, id in value[1]]
+
+        self.assertTrue(len(keys) > len(new_keys))
+        self.assertEqual(len(new_keys), 19) #new keys has 19 elements instead of 20
+
+        self.assertTrue(15 in keys)
+        self.assertFalse(15 in new_keys) # the key 15 is the one missing
+
+
 if __name__ == '__main__':
     unittest.main()
