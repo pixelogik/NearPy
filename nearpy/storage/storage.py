@@ -65,5 +65,3 @@ class Storage(object):
         Loads and returns hash configuration
         """
         raise NotImplementedError
-
-
