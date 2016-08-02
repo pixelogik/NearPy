@@ -89,3 +89,9 @@ def want_string(arg, encoding='utf-8'):
     else:
         rv = arg
     return rv
+
+
+def get_keys(engine):
+    for lshash in engine.lshashes:
+        bucket = engine.storage.buckets[lshash.hash_name][lshash.hash_name]
+        return {i[1] for i in bucket}
