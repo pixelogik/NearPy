@@ -26,12 +26,15 @@ import unittest
 
 from nearpy import Engine
 from nearpy.utils.utils import unitvec
+from nearpy.hashes import UniBucket
+from nearpy.utils import get_keys
 
 
 class TestEngine(unittest.TestCase):
 
     def setUp(self):
         self.engine = Engine(1000)
+        numpy.random.seed(4)
 
     def test_storage_issue(self):
         engine1 = Engine(100)
@@ -72,6 +75,49 @@ class TestEngine(unittest.TestCase):
             self.assertAlmostEqual(numpy.abs((normalized_x - y)).max(), 0, delta=delta)
             self.assertEqual(y_data, x_data)
             self.assertAlmostEqual(y_distance, 0.0, delta=delta)
+
+    def test_delete_vector_single_hash(self):
+        dim = 5
+        name_hash = 'testHash'
+        unibucket = UniBucket(name_hash)
+        engine = Engine(dim, lshashes=[unibucket])
+        # Index 20 random vectors (set their data to a unique string)
+        for index in range(20):
+            v = numpy.random.randn(dim)
+            engine.store_vector(v, index)
+
+        keys = get_keys(engine)
+
+        engine.delete_vector(15)  #delete the vector with key = 15
+
+        new_keys = get_keys(engine)
+
+        self.assertTrue(len(keys) > len(new_keys))  #new keys has 19 elements instead of 20
+        self.assertIn(15, keys)
+        self.assertNotIn(15, new_keys)  # the key 15 is the one missing
+
+    def test_delete_vector_multiple_hash(self):
+        dim = 5
+        hashes = []
+        for k in range(10): # 10 hashes
+            unibucket = UniBucket('name_hash_%d' % k)
+            hashes.append(unibucket)
+        engine = Engine(dim, lshashes=hashes)
+        # Index 20 random vectors (set their data to a unique string)
+        for index in range(20):
+            v = numpy.random.randn(dim)
+            engine.store_vector(v, index)
+
+        keys = get_keys(engine)
+
+        engine.delete_vector(15)  #delete the vector with key = 15
+
+        new_keys = get_keys(engine)
+
+        self.assertTrue(len(keys) > len(new_keys))  #new keys has 19 elements instead of 20
+        self.assertIn(15, keys)
+        self.assertNotIn(15, new_keys)  # the key 15 is the one missing
+
 
 if __name__ == '__main__':
     unittest.main()

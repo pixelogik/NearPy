@@ -21,4 +21,4 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 
-from nearpy.utils.utils import numpy_array_from_list_or_numpy_array, perform_pca, want_string
+from nearpy.utils.utils import numpy_array_from_list_or_numpy_array, perform_pca, want_string, get_keys

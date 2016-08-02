@@ -30,6 +30,12 @@ class Storage(object):
         """
         raise NotImplementedError
 
+    def delete_vector(self, hash_name, data):
+        """
+        Deletes vector and JSON-serializable data in bucket with specified key.
+        """
+        raise NotImplementedError
+
     def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
