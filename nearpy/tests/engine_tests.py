@@ -23,6 +23,8 @@
 import numpy
 import scipy
 import unittest
+import itertools
+    
 
 from nearpy import Engine
 from nearpy.utils.utils import unitvec
@@ -75,9 +77,12 @@ class TestEngine(unittest.TestCase):
             self.assertAlmostEqual(y_distance, 0.0, delta=delta)
 
     def get_keys(self, engine):
-        for lshash in engine.lshashes:
+        def get_bucket_keys(lshash):
             bucket = engine.storage.buckets[lshash.hash_name][lshash.hash_name]
-            return {i[1] for i in bucket}
+            return (i for v, i in bucket)
+
+        return set(itertools.chain.from_iterable(
+            get_bucket_keys(lshash) for lshash in engine.lshashes))
 
     def test_delete_vector_single_hash(self):
         dim = 5

@@ -53,8 +53,9 @@ class MemoryStorage(Storage):
         """
         Deletes vector and JSON-serializable data in bucket with specified key.
         """
-        for bucket_key in self.buckets[hash_name]:
-            self.buckets[hash_name][bucket_key] = [(v, id_data) for v, id_data in self.buckets[hash_name][bucket_key] if id_data != data]
+        for bucket in self.buckets[hash_name].values():
+            bucket[:] = [(v, id_data) for v, id_data in bucket if id_data != data]
+
 
     def get_bucket(self, hash_name, bucket_key):
         """
