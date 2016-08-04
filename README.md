@@ -8,7 +8,7 @@ To install simply do *pip install NearPy*. It will also install the packages sci
 
 Both dense and sparse (scipy.sparse) vectors are supported right now.
 
-Read more here: http://nearpy.io
+Read more here: http://pixelogik.github.io/NearPy/
 
 ## Principle
 
