@@ -27,8 +27,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import redis
-import json
 import numpy
 import scipy
 try:
@@ -36,6 +34,7 @@ try:
 except ImportError:
     import pickle
 
+from future.builtins import bytes
 from nearpy.storage.storage import Storage
 
 
@@ -50,7 +49,7 @@ class RedisStorage(Storage):
         """
         Stores vector and JSON-serializable data in bucket with specified key.
         """
-        redis_key = 'nearpy_%s_%s' % (hash_name, bucket_key)
+        redis_key = self._format_redis_key(hash_name, bucket_key)
 
         val_dict = {}
 
@@ -80,22 +79,58 @@ class RedisStorage(Storage):
         val_dict['dtype'] = v.dtype.name
 
         # Add data if set
-        if data:
+        if data is not None:
             val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
         self.redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
 
+    def _format_redis_key(self, hash_name, bucket_key):
+        return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
+
+    def _format_hash_prefix(self, hash_name):
+        return "nearpy_{}_".format(hash_name)
+
+    def get_all_bucket_keys(self, hash_name):
+        prefix_len = len(self._format_hash_prefix(hash_name))
+        return [bytes(key).decode()[prefix_len:]
+                for key in self._iter_bucket_keys(hash_name)]
+
+    def _iter_bucket_keys(self, hash_name):
+        pattern = "{}*".format(self._format_hash_prefix(hash_name))
+        return self.redis_object.scan_iter(pattern)
+
+    def _get_bucket_rows(self, hash_name, bucket_key):
+        redis_key = self._format_redis_key(hash_name, bucket_key)
+        return self.redis_object.lrange(redis_key, 0, -1)
+
+    def delete_vector(self, hash_name, bucket_keys, data):
+        """
+        Deletes vector and JSON-serializable data in buckets with specified keys.
+        """
+        with self.redis_object.pipeline() as pipeline:
+            for key in bucket_keys:
+                redis_key = self._format_redis_key(hash_name, key)
+                rows = [(row, pickle.loads(row).get('data'))
+                        for row in self._get_bucket_rows(hash_name, key)]
+                for _, id_data in rows:
+                    if id_data == data:
+                        break
+                else:
+                    # Deleted data is not present in this bucket
+                    continue
+                pipeline.delete(redis_key)
+                pipeline.rpush(redis_key, *(row for row, id_data in rows
+                                            if id_data != data))
+            pipeline.execute()
+
     def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
         """
-        redis_key = 'nearpy_%s_%s' % (hash_name, bucket_key)
-        items = self.redis_object.lrange(redis_key, 0, -1)
         results = []
-        for item_str in items:
-            val_dict = pickle.loads(item_str)
-
+        for row in self._get_bucket_rows(hash_name, bucket_key):
+            val_dict = pickle.loads(row)
             # Depending on type (sparse or not) reconstruct vector
             if 'sparse' in val_dict:
 
@@ -123,10 +158,7 @@ class RedisStorage(Storage):
                                           dtype=val_dict['dtype'])
 
             # Add data to result tuple, if present
-            if 'data' in val_dict:
-                results.append((vector, val_dict['data']))
-            else:
-                results.append((vector, None))
+            results.append((vector, val_dict.get('data')))
 
         return results
 
@@ -134,17 +166,15 @@ class RedisStorage(Storage):
         """
         Removes all buckets and their content for specified hash.
         """
-        bucket_keys = self.redis_object.keys(pattern='nearpy_%s_*' % hash_name)
-        for bucket_key in bucket_keys:
-            self.redis_object.delete(bucket_key)
+        bucket_keys = self._iter_bucket_keys(hash_name)
+        self.redis_object.delete(*bucket_keys)
 
     def clean_all_buckets(self):
         """
         Removes all buckets from all hashes and their content.
         """
         bucket_keys = self.redis_object.keys(pattern='nearpy_*')
-        for bucket_key in bucket_keys:
-            self.redis_object.delete(bucket_key)
+        self.redis_object.delete(*bucket_keys)
 
     def store_hash_configuration(self, lshash):
         """

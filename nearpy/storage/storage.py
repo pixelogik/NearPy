@@ -30,9 +30,16 @@ class Storage(object):
         """
         raise NotImplementedError
 
-    def delete_vector(self, hash_name, data):
+    def get_all_bucket_keys(self, hash_name):
         """
-        Deletes vector and JSON-serializable data in bucket with specified key.
+        Returns all bucket keys for the given hash as iterable of strings
+        """
+        raise NotImplementedError
+
+
+    def delete_vector(self, hash_name, bucket_keys, data):
+        """
+        Deletes vector and JSON-serializable data in buckets with specified keys.
         """
         raise NotImplementedError
 
