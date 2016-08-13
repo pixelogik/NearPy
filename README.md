@@ -8,7 +8,7 @@ To install simply do *pip install NearPy*. It will also install the packages sci
 
 Both dense and sparse (scipy.sparse) vectors are supported right now.
 
-Read more here: http://nearpy.io
+Read more here: http://pixelogik.github.io/NearPy/
 
 ## Principle
 
@@ -26,7 +26,7 @@ neighbours. In many applications this is fine because you just wanna get 20 vect
 When using NearPy you will mostly do this by configuring and using an Engine object. Engines are configurable
 pipelines for approximated nearest neighbour search (ANNS) using locality sensitive hashes (LSHs).
 
-![alt text](http://nearpy.io/images/Pipeline.png "Pipeline diagram")
+![alt text](http://pixelogik.github.io/NearPy/images/Pipeline.png "Pipeline diagram")
 
 Engines are configured using the constructor that accepts the different components along the pipeline:
 
