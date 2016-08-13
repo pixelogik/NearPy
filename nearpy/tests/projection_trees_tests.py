@@ -20,8 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import numpy
 import unittest
+import functools
+import numpy
 
 from nearpy import Engine
 from nearpy.filters import NearestFilter
@@ -31,12 +32,17 @@ from mockredis import MockRedis as Redis
 from nearpy.storage import MemoryStorage, RedisStorage
 
 
+RandomBinaryProjectionTree = functools.partial(RandomBinaryProjectionTree,
+                                               rand_seed=12)
+
+
 class TestRandomBinaryProjectionTree(unittest.TestCase):
 
     def setUp(self):
         self.memory = MemoryStorage()
         self.redis_object = Redis()
         self.redis_storage = RedisStorage(self.redis_object)
+        numpy.random.seed(16)
 
     def test_retrieval(self):
         # We want 12 projections, 20 results at least
@@ -105,7 +111,6 @@ class TestRandomBinaryProjectionTree(unittest.TestCase):
             x = numpy.random.randn(100)
             x_data = 'data'
             self.engine.store_vector(x, x_data)
-
 
         self.redis_storage.store_hash_configuration(rbpt)
 
