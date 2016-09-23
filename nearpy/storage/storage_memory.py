@@ -27,6 +27,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from future.utils import viewkeys
 from nearpy.storage.storage import Storage
 
 
@@ -48,6 +49,18 @@ class MemoryStorage(Storage):
         if not bucket_key in self.buckets[hash_name]:
             self.buckets[hash_name][bucket_key] = []
         self.buckets[hash_name][bucket_key].append((v, data))
+
+    def get_all_bucket_keys(self, hash_name):
+        return viewkeys(self.buckets[hash_name])
+
+    def delete_vector(self, hash_name, bucket_keys, data):
+        """
+        Deletes vector and JSON-serializable data in buckets with specified keys.
+        """
+        for key in bucket_keys:
+            bucket = self.get_bucket(hash_name, key)
+            bucket[:] = [(v, id_data) for v, id_data
+                         in bucket if id_data != data]
 
     def get_bucket(self, hash_name, bucket_key):
         """
@@ -81,4 +94,3 @@ class MemoryStorage(Storage):
         Loads and returns hash configuration
         """
         return self.hash_configs.get(hash_name)
-

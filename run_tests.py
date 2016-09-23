@@ -1,9 +1,6 @@
 #! /usr/bin/env python
-import subprocess
+import pytest
 
-def main():
-    errno = subprocess.call(['py.test'])
-    raise SystemExit(errno)
 
 if __name__ == '__main__':
-    main()
+    pytest.main()

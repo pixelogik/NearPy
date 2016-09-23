@@ -89,3 +89,4 @@ def want_string(arg, encoding='utf-8'):
     else:
         rv = arg
     return rv
+

@@ -30,6 +30,19 @@ class Storage(object):
         """
         raise NotImplementedError
 
+    def get_all_bucket_keys(self, hash_name):
+        """
+        Returns all bucket keys for the given hash as iterable of strings
+        """
+        raise NotImplementedError
+
+
+    def delete_vector(self, hash_name, bucket_keys, data):
+        """
+        Deletes vector and JSON-serializable data in buckets with specified keys.
+        """
+        raise NotImplementedError
+
     def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
@@ -59,6 +72,3 @@ class Storage(object):
         Loads and returns hash configuration
         """
         raise NotImplementedError
-
-
-

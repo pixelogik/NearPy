@@ -96,6 +96,19 @@ class Engine(object):
                 self.storage.store_vector(lshash.hash_name, bucket_key,
                                           nv, data)
 
+    def delete_vector(self, data, v=None):
+        """
+        Deletes vector v and his id (data) in all matching buckets in the storage.
+        The data argument must be JSON-serializable.
+        """
+
+        # Delete data id in each hashes
+        for lshash in self.lshashes:
+            if v is None:
+                keys = self.storage.get_all_bucket_keys(lshash.hash_name)
+            else:
+                keys = lshash.hash_vector(v)
+            self.storage.delete_vector(lshash.hash_name, keys, data)
 
     def candidate_count(self, v):
         """

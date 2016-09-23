@@ -20,16 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import itertools
+import unittest
+
 import numpy
 import scipy
-import unittest
+from future.builtins import range
 
 from nearpy import Engine
 from nearpy.utils.utils import unitvec
+from nearpy.hashes import UniBucket
 
 
 class TestEngine(unittest.TestCase):
-
     def setUp(self):
         self.engine = Engine(1000)
 
@@ -43,7 +46,7 @@ class TestEngine(unittest.TestCase):
             engine1.store_vector(x, x_data)
 
         # Each engine should have its own default storage
-        self.assertTrue(len(engine2.storage.buckets)==0)
+        self.assertEqual(len(engine2.storage.buckets), 0)
 
     def test_retrieval(self):
         for k in range(100):
@@ -72,6 +75,55 @@ class TestEngine(unittest.TestCase):
             self.assertAlmostEqual(numpy.abs((normalized_x - y)).max(), 0, delta=delta)
             self.assertEqual(y_data, x_data)
             self.assertAlmostEqual(y_distance, 0.0, delta=delta)
+
+
+class TestDelete(unittest.TestCase):
+    def setUp(self):
+        self.dim = 5
+        self.all_values = list(range(20))
+        self.removed_value = 15
+        self.removed_vector = numpy.ones(self.dim) * self.removed_value
+
+    def get_keys(self, engine):
+        def get_bucket_keys(lshash):
+            bucket = engine.storage.buckets[lshash.hash_name][lshash.hash_name]
+            return (i for v, i in bucket)
+
+        return set(itertools.chain.from_iterable(
+            get_bucket_keys(lshash) for lshash in engine.lshashes))
+
+    def fill_engine(self, engine):
+        # Index 20 vectors (set their data to a unique string)
+        for index in self.all_values:
+            v = numpy.ones(self.dim) * index
+            engine.store_vector(v, index)
+        self.assertSequenceEqual(sorted(self.get_keys(engine)),
+                                 self.all_values)
+
+    def check_delete(self, engine):
+        expected_values = self.all_values
+        expected_values.remove(self.removed_value)
+        self.assertSequenceEqual(sorted(self.get_keys(engine)), expected_values)
+
+    def test_delete_vector_single_hash(self):
+        engine = Engine(self.dim, lshashes=[UniBucket('testHash')])
+        self.fill_engine(engine)
+        engine.delete_vector(self.removed_value)
+        self.check_delete(engine)
+
+    def test_delete_vector_multiple_hash(self):
+        hashes = [UniBucket('name_hash_%d' % k) for k in range(10)]
+        engine = Engine(self.dim, lshashes=hashes)
+        self.fill_engine(engine)
+        engine.delete_vector(self.removed_value)
+        self.check_delete(engine)
+
+    def test_delete_vector_with_provided_value(self):
+        engine = Engine(self.dim, lshashes=[UniBucket('testHash')])
+        self.fill_engine(engine)
+        engine.delete_vector(self.removed_value, self.removed_vector)
+        self.check_delete(engine)
+
 
 if __name__ == '__main__':
     unittest.main()
