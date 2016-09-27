@@ -7,7 +7,7 @@ setup_requires = ['pytest-runner>=2.0,<3.0'] if needs_pytest else []
 
 setup(
     name='NearPy',
-    version='0.2.3',
+    version='1.0.0',
     author='Ole Krause-Sparmann',
     author_email='ole@pixelogik.de',
     packages=[
@@ -20,9 +20,10 @@ setup(
         'nearpy.storage',
         'nearpy.utils'
     ],
-    url='http://pypi.python.org/pypi/NearPy/',
+    url='https://github.com/pixelogik/NearPy',
     license='LICENSE.txt',
     description='Framework for fast approximated nearest neighbour search.',
+    keywords='nearpy approximate nearest neighbour',
     long_description=open('README.txt').read(),
     install_requires=[
         "numpy",
