@@ -29,6 +29,9 @@
 
 import numpy
 import scipy
+import json
+import zlib
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -83,7 +86,8 @@ class RedisStorage(Storage):
             val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
-        self.redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
+        self.redis_object.rpush(
+            redis_key, zlib.compress(bytes(json.dumps(val_dict), 'UTF-8'), 9))
 
     def _format_redis_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
@@ -111,7 +115,8 @@ class RedisStorage(Storage):
         with self.redis_object.pipeline() as pipeline:
             for key in bucket_keys:
                 redis_key = self._format_redis_key(hash_name, key)
-                rows = [(row, pickle.loads(row).get('data'))
+                rows = [(row, json.loads(
+                    zlib.decompress(row.decode('UTF-8'))).get('data'))
                         for row in self._get_bucket_rows(hash_name, key)]
                 for _, id_data in rows:
                     if id_data == data:
@@ -130,7 +135,8 @@ class RedisStorage(Storage):
         """
         results = []
         for row in self._get_bucket_rows(hash_name, bucket_key):
-            val_dict = pickle.loads(row)
+            val_dict = json.loads(zlib.decompress(row.decode('UTF-8')))
+
             # Depending on type (sparse or not) reconstruct vector
             if 'sparse' in val_dict:
 
