@@ -23,11 +23,18 @@
 import numpy
 import scipy
 import unittest
-
+import nearpy.utils.utils
 from nearpy import Engine
 from nearpy.distances import CosineDistance
 
 from nearpy.hashes import RandomBinaryProjections, RandomBinaryProjectionTree, HashPermutations, HashPermutationMapper
+
+def print_results(results):
+    print('  Data \t| Distance')
+    for r in results:
+        data = r[1]
+        dist = r[2]
+        print('  {} \t| {:.4f}'.format(data, dist))
 
 def example1():
 
@@ -82,11 +89,11 @@ def example1():
     matrix = numpy.zeros((POINTS,DIM))
     for i in xrange(POINTS):
         v = numpy.random.randn(DIM)
-        matrix[i] = v
-        engine.store_vector(v)
-        engine_rbpt.store_vector(v)
-        engine_perm.store_vector(v)
-        engine_perm2.store_vector(v)
+        matrix[i, :] = nearpy.utils.utils.unitvec(v)
+        engine.store_vector(v, i)
+        engine_rbpt.store_vector(v, i)
+        engine_perm.store_vector(v, i)
+        engine_perm2.store_vector(v, i)
 
     print('Buckets 1 = %d' % len(engine.storage.buckets['rbp1'].keys()))
     print('Buckets 2 = %d' % len(engine_rbpt.storage.buckets['rbpt'].keys()))
@@ -105,36 +112,38 @@ def example1():
     print('\nNeighbour distances with RandomBinaryProjectionTree:')
     print('  -> Candidate count is %d' % engine_rbpt.candidate_count(query))
     results = engine_rbpt.neighbours(query)
-    dists = [x[2] for x in results]
-    print(dists)
+    print_results(results)
 
     # Do random query on engine 2
     print('\nNeighbour distances with RandomBinaryProjections:')
     print('  -> Candidate count is %d' % engine.candidate_count(query))
     results = engine.neighbours(query)
-    dists = [x[2] for x in results]
-    print(dists)
+    print_results(results)
 
     # Do random query on engine 3
     print('\nNeighbour distances with HashPermutations:')
     print('  -> Candidate count is %d' % engine_perm.candidate_count(query))
     results = engine_perm.neighbours(query)
-    dists = [x[2] for x in results]
-    print(dists)
+    print_results(results)
 
     # Do random query on engine 4
     print('\nNeighbour distances with HashPermutations2:')
     print('  -> Candidate count is %d' % engine_perm2.candidate_count(query))
     results = engine_perm2.neighbours(query)
-    dists = [x[2] for x in results]
-    print(dists)
+    print_results(results)
 
     # Real neighbours
     print('\nReal neighbour distances:')
-    query = query.reshape((1,DIM))
+    query = nearpy.utils.utils.unitvec(query)
+    query = query.reshape((DIM, 1))
     dists = CosineDistance().distance(matrix,query)
     dists = dists.reshape((-1,))
-    dists = sorted(dists)
-    print(dists[:10])
+    # dists = sorted(dists)
+
+    dists_argsort = numpy.argsort(dists)
+
+    results = [(None, d, dists[d]) for d in dists_argsort[:10]]
+    print_results(results)
+
 
 
