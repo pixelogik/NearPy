@@ -30,7 +30,7 @@ from nearpy.hashes import RandomBinaryProjectionTree
 from nearpy.filters import NearestFilter, UniqueFilter
 from nearpy.distances import EuclideanDistance
 from nearpy.distances import CosineDistance
-from nearpy.storage import MemoryStorage
+from nearpy.storage import MemoryStorage, MongoStorage
 from nearpy.utils.utils import unitvec
 
 
@@ -127,7 +127,11 @@ class Engine(object):
         candidates = self._get_candidates(v)
         return len(candidates)
 
-    def neighbours(self, v):
+    def neighbours(self, v,
+                   distance=None,
+                   fetch_vector_filters=None,
+                   vector_filters=None,
+                   mongo_fetch_vector_filters=None):
         """
         Hashes vector v, collects all candidate vectors from the matching
         buckets in storage, applys the (optional) distance function and
@@ -136,32 +140,38 @@ class Engine(object):
         """
 
         # Collect candidates from all buckets from all hashes
-        candidates = self._get_candidates(v)
+        candidates = self._get_candidates(v, mongo_fetch_vector_filters)
         # print 'Candidate count is %d' % len(candidates)
 
         # Apply fetch vector filters if specified and return filtered list
-        if self.fetch_vector_filters:
-            candidates = self._apply_filter(self.fetch_vector_filters, candidates)
+        if fetch_vector_filters:
+            candidates = self._apply_filter(fetch_vector_filters,
+                                            candidates)
 
         # Apply distance implementation if specified
-        if self.distance:
-            candidates = self._append_distances(v, self.distance, candidates)
+        if not distance:
+            distance = self.distance
+        candidates = self._append_distances(v, distance, candidates)
 
         # Apply vector filters if specified and return filtered list
-        if self.vector_filters:
-            candidates = self._apply_filter(self.vector_filters, candidates)
+        if not vector_filters:
+            vector_filters = self.vector_filters
+        candidates = self._apply_filter(vector_filters, candidates)
 
         # If there is no vector filter, just return list of candidates
         return candidates
 
 
-    def _get_candidates(self, v):
+    def _get_candidates(self, v, mongo_fetch_vector_filters=None):
         """ Collect candidates from all buckets from all hashes """
         candidates = []
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v, querying=True):
-                bucket_content = self.storage.get_bucket(lshash.hash_name,
-                                                         bucket_key)
+                bucket_content = self.storage.get_bucket(
+                    lshash.hash_name,
+                    bucket_key,
+                    mongo_fetch_vector_filters
+                )
                 #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
                 candidates.extend(bucket_content)
         return candidates
