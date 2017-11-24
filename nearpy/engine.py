@@ -167,11 +167,17 @@ class Engine(object):
         candidates = []
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v, querying=True):
-                bucket_content = self.storage.get_bucket(
-                    lshash.hash_name,
-                    bucket_key,
-                    mongo_fetch_vector_filters
-                )
+                if mongo_fetch_vector_filters:
+                    bucket_content = self.storage.get_bucket(
+                        lshash.hash_name,
+                        bucket_key,
+                        mongo_fetch_vector_filters
+                    )
+                else:
+                    bucket_content = self.storage.get_bucket(
+                        lshash.hash_name,
+                        bucket_key,
+                    )
                 #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
                 candidates.extend(bucket_content)
         return candidates
