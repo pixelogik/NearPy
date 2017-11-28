@@ -96,6 +96,21 @@ class Engine(object):
                 self.storage.store_vector(lshash.hash_name, bucket_key,
                                           nv, data)
 
+    def store_many_vectors(self, vs, data=None):
+        """
+        Store a batch of vectors in Redis. 
+        Hashes vector v and stores it in all matching buckets in the storage.
+        The data argument must be JSON-serializable. It is stored with the
+        vector and will be returned in search results.
+        """
+        # We will store the normalized vector (used during retrieval)
+        nvs = [unitvec(i) for i in vs]
+        # Store vector in each bucket of all hashes
+        for lshash in self.lshashes:
+            bucket_keys = [lshash.hash_vector(i)[0] for i in vs]
+            self.storage.store_many_vectors(lshash.hash_name, bucket_keys,
+                                            nvs, data)
+
     def delete_vector(self, data, v=None):
         """
         Deletes vector v and his id (data) in all matching buckets in the storage.
