@@ -23,7 +23,7 @@
 import numpy
 import unittest
 
-from mockredis import MockRedis as Redis
+from redis import Redis
 
 from nearpy.storage import MemoryStorage, RedisStorage
 
@@ -96,7 +96,6 @@ class TestHashStorage(unittest.TestCase):
             for j in range(hash1.components.shape[1]):
                 self.assertEqual(hash1.components[i, j], hash2.components[i, j])
 
-
     def test_hash_memory_storage_pcadp(self):
         train_vectors = numpy.random.randn(10, 100)
         hash1 = PCADiscretizedProjections('testPCADPHash', 4, train_vectors, 0.1)
@@ -114,7 +113,6 @@ class TestHashStorage(unittest.TestCase):
         for i in range(hash1.components.shape[0]):
             for j in range(hash1.components.shape[1]):
                 self.assertEqual(hash1.components[i, j], hash2.components[i, j])
-
 
     def test_hash_redis_storage_none_config(self):
         conf = self.redis_storage.load_hash_configuration('nonexistentHash')
@@ -172,7 +170,6 @@ class TestHashStorage(unittest.TestCase):
         for i in range(hash1.components.shape[0]):
             for j in range(hash1.components.shape[1]):
                 self.assertEqual(hash1.components[i, j], hash2.components[i, j])
-
 
     def test_hash_redis_storage_pcadp(self):
         train_vectors = numpy.random.randn(10, 100)
