@@ -28,7 +28,7 @@ from nearpy import Engine
 from nearpy.filters import NearestFilter
 from nearpy.hashes import RandomBinaryProjectionTree
 
-from mockredis import MockRedis as Redis
+from redis import Redis
 
 from nearpy.storage import MemoryStorage, RedisStorage
 
