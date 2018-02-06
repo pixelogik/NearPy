@@ -1,4 +1,4 @@
-# NearPy
+# NearPy [![Build Status](https://travis-ci.org/pixelogik/NearPy.svg?branch=master)](https://travis-ci.org/pixelogik/NearPy)
 
 NearPy is a Python framework for fast (approximated) nearest neighbour search in high dimensional vector spaces using different locality-sensitive hashing methods.
 
@@ -48,7 +48,7 @@ needed if you use filters that need a distance (like NearestFilter or DistanceTh
 Filters are used in a last step during querying nearest neighbours. Existing implementations are NearestFilter, DistanceThresholdFilter and UniqueFilter.
 
 The is another parameter to the engine called fetch_vector_filters, which is performed after fetching candidate vectors from the buckets and before distances
-or vector filters are used. This is by default one UniqueFilter and it should always be. I keep this still as a parameter if people need to play around with that. 
+or vector filters are used. This is by default one UniqueFilter and it should always be. I keep this still as a parameter if people need to play around with that.
 
 The engine supports different kinds of ways how the indexed vectors (and the buckets) are stored. Current
 storage implementations are MemoryStorage and RedisStorage.
