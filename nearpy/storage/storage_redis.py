@@ -85,6 +85,49 @@ class RedisStorage(Storage):
         # Push JSON representation of dict to end of bucket list
         self.redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
 
+    def store_many_vectors(self, hash_name, bucket_keys, vs, data):
+        """
+        Store a batch of vectors in Redis.
+        Stores vector and JSON-serializable data in bucket with specified key.
+        """
+        with self.redis_object.pipeline() as pipeline:
+            for idx, v in enumerate(vs):
+                redis_key = self._format_redis_key(hash_name, bucket_keys[idx])
+                val_dict = {}
+
+                # Depending on type (sparse or not) fill value dict
+                if scipy.sparse.issparse(v):
+                    # Make sure that we are using COO format (easy to handle)
+                    if not scipy.sparse.isspmatrix_coo(v):
+                        v = scipy.sparse.coo_matrix(v)
+
+                    # Construct list of [index, value] items,
+                    # one for each non-zero element of the sparse vector
+                    encoded_values = []
+
+                    for k in range(v.data.size):
+                        row_index = v.row[k]
+                        value = v.data[k]
+                        encoded_values.append([int(row_index), value])
+
+                    val_dict['sparse'] = 1
+                    val_dict['nonzeros'] = encoded_values
+                    val_dict['dim'] = v.shape[0]
+                else:
+                    # Make sure it is a 1d vector
+                    v = numpy.reshape(v, v.shape[0])
+                    val_dict['vector'] = v.tostring()
+
+                val_dict['dtype'] = v.dtype.name
+
+                # Add data if set
+                if data is not None:
+                    val_dict['data'] = data[idx]
+
+                # Push JSON representation of dict to end of bucket list
+                pipeline.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
+            pipeline.execute()
+
     def _format_redis_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
 
