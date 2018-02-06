@@ -23,7 +23,7 @@
 import numpy
 import unittest
 
-from redis import Redis
+from mockredis import MockRedis as Redis
 
 from nearpy.storage import MemoryStorage, RedisStorage
 

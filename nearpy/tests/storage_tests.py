@@ -24,7 +24,7 @@ import unittest
 import numpy
 import scipy
 
-from redis import Redis
+from mockredis import MockRedis as Redis
 
 from future.builtins import range
 
