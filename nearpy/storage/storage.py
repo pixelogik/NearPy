@@ -30,6 +30,13 @@ class Storage(object):
         """
         raise NotImplementedError
 
+    def store_many_vectors(self, hash_name, bucket_keys, vs, data):
+        """
+        Store a batch of vectors.
+        Stores vector and JSON-serializable data in bucket with specified key.
+        """
+        raise NotImplementedError
+
     def get_all_bucket_keys(self, hash_name):
         """
         Returns all bucket keys for the given hash as iterable of strings

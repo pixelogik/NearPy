@@ -98,10 +98,11 @@ class Engine(object):
 
     def store_many_vectors(self, vs, data=None):
         """
-        Store a batch of vectors in Redis. 
-        Hashes vector v and stores it in all matching buckets in the storage.
-        The data argument must be JSON-serializable. It is stored with the
-        vector and will be returned in search results.
+        Store a batch of vectors.
+        Hashes vector vs and stores them in all matching buckets in the storage.
+        The data argument must be either None or a list of JSON-serializable
+        object. It is stored with the vector and will be returned in search
+        results.
         """
         # We will store the normalized vector (used during retrieval)
         nvs = [unitvec(i) for i in vs]

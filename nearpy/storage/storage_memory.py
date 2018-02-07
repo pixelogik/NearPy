@@ -50,6 +50,17 @@ class MemoryStorage(Storage):
             self.buckets[hash_name][bucket_key] = []
         self.buckets[hash_name][bucket_key].append((v, data))
 
+    def store_many_vectors(self, hash_name, bucket_keys, vs, data):
+        """
+        Store a batch of vectors.
+        Stores vector and JSON-serializable data in bucket with specified key.
+        """
+        for idx, v in enumerate(vs):
+            if data is not None:
+                self.store_vector(hash_name, bucket_keys[idx], v, data[idx])
+            else:
+                self.store_vector(hash_name, bucket_keys[idx], v, data)
+
     def get_all_bucket_keys(self, hash_name):
         return viewkeys(self.buckets[hash_name])
 
