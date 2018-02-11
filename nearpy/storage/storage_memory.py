@@ -29,6 +29,7 @@
 
 from future.utils import viewkeys
 from nearpy.storage.storage import Storage
+import itertools
 
 
 class MemoryStorage(Storage):
@@ -55,11 +56,10 @@ class MemoryStorage(Storage):
         Store a batch of vectors.
         Stores vector and JSON-serializable data in bucket with specified key.
         """
-        for idx, v in enumerate(vs):
-            if data is not None:
-                self.store_vector(hash_name, bucket_keys[idx], v, data[idx])
-            else:
-                self.store_vector(hash_name, bucket_keys[idx], v, data)
+        if data is None:
+            data = itertools.repeat(data)
+        for v, k, d in zip(vs, bucket_keys, data):
+            self.store_vector(hash_name, k, v, d)
 
     def get_all_bucket_keys(self, hash_name):
         return viewkeys(self.buckets[hash_name])
