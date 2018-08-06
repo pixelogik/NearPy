@@ -28,6 +28,7 @@
 # THE SOFTWARE.
 
 from future.utils import viewkeys
+from future.builtins import zip
 from nearpy.storage.storage import Storage
 import itertools
 
