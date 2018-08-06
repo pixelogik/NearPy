@@ -27,6 +27,7 @@ import scipy
 from mockredis import MockRedis as Redis
 
 from future.builtins import range
+from future.builtins import zip
 
 from nearpy.storage import MemoryStorage, RedisStorage
 
