@@ -55,6 +55,24 @@ class StorageTest(unittest.TestCase):
         self.storage.clean_all_buckets()
         self.assertEqual(self.storage.get_bucket('testHash', bucket_key), [])
 
+    def check_store_many_vectors(self, xs):
+        num_vector = len(xs)
+        bucket_keys = list(map(str,
+                               list(range(10000000,
+                                          10000000 + num_vector))))
+        x_data = list(range(0, num_vector))
+        self.storage.store_many_vectors('testHash', bucket_keys, xs, x_data)
+        for bucket_key, x, data in zip(bucket_keys, xs, x_data):
+            bucket = self.storage.get_bucket('testHash', bucket_key)
+            self.assertEqual(len(bucket), 1)
+            y, y_data = bucket[0]
+            self.assertEqual(type(y), type(x))
+            self.assertEqual(y.shape, x.shape)
+            self.assertEqual(max(abs(y - x)), 0)
+            self.assertEqual(y_data, data)
+        self.storage.clean_all_buckets()
+        self.assertEqual(self.storage.get_bucket('testHash', bucket_key), [])
+
     def check_get_all_bucket_keys(self):
         x, x_data = numpy.ones(100), "data"
         hash_config = [
@@ -134,6 +152,11 @@ class RedisStorageTest(StorageTest):
         bucket = self.storage.get_bucket(hash_name, bucket_name)
         _, data = bucket[0]
         self.assertEqual(data, 0)
+
+    def test_store_many_vectors(self):
+        x = numpy.random.randn(100, 10)
+        self.check_store_many_vectors(x)
+
 
 if __name__ == '__main__':
     unittest.main()
