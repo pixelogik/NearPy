@@ -32,9 +32,11 @@ from nearpy.storage import MemoryStorage, RedisStorage, MongoStorage
 
 
 class StorageTest(unittest.TestCase):
+
     """
     Base class for storage tests.
     """
+
     def setUp(self):
         self.storage.clean_all_buckets()
         numpy.random.seed(4)
@@ -85,6 +87,7 @@ class StorageTest(unittest.TestCase):
 
 
 class MemoryStorageTest(StorageTest):
+
     def setUp(self):
         self.storage = MemoryStorage()
         super(MemoryStorageTest, self).setUp()
@@ -105,6 +108,7 @@ class MemoryStorageTest(StorageTest):
 
 
 class RedisStorageTest(StorageTest):
+
     def setUp(self):
         self.storage = RedisStorage(Redis())
         super(RedisStorageTest, self).setUp()
