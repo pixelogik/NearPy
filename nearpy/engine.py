@@ -130,8 +130,7 @@ class Engine(object):
     def neighbours(self, v,
                    distance=None,
                    fetch_vector_filters=None,
-                   vector_filters=None,
-                   mongo_fetch_vector_filters=None):
+                   vector_filters=None):
         """
         Hashes vector v, collects all candidate vectors from the matching
         buckets in storage, applys the (optional) distance function and
@@ -140,7 +139,7 @@ class Engine(object):
         """
 
         # Collect candidates from all buckets from all hashes
-        candidates = self._get_candidates(v, mongo_fetch_vector_filters)
+        candidates = self._get_candidates(v)
         # print 'Candidate count is %d' % len(candidates)
 
         # Apply fetch vector filters if specified and return filtered list
@@ -162,22 +161,15 @@ class Engine(object):
         return candidates
 
 
-    def _get_candidates(self, v, mongo_fetch_vector_filters=None):
+    def _get_candidates(self, v):
         """ Collect candidates from all buckets from all hashes """
         candidates = []
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v, querying=True):
-                if mongo_fetch_vector_filters:
-                    bucket_content = self.storage.get_bucket(
-                        lshash.hash_name,
-                        bucket_key,
-                        mongo_fetch_vector_filters
-                    )
-                else:
-                    bucket_content = self.storage.get_bucket(
-                        lshash.hash_name,
-                        bucket_key,
-                    )
+                bucket_content = self.storage.get_bucket(
+                    lshash.hash_name,
+                    bucket_key,
+                )
                 #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
                 candidates.extend(bucket_content)
         return candidates

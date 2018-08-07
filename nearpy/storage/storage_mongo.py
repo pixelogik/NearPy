@@ -81,11 +81,7 @@ class MongoStorage(Storage):
 
         # Add data if set
         if data is not None:
-            if isinstance(data, str):
-                val_dict['data'] = data
-            elif isinstance(data, dict):
-                # Assume using Python 3.5
-                val_dict = {**val_dict, **data}
+            val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
         self.mongo_object.insert_one(val_dict)
@@ -101,14 +97,9 @@ class MongoStorage(Storage):
         return list(self.mongo_object.find(
             {'lsh': {'$regex': self._format_hash_prefix(hash_name)}}))
 
-    def _get_bucket_rows(self, hash_name, bucket_key,
-                         mongo_fetch_vector_filters=None):
+    def _get_bucket_rows(self, hash_name, bucket_key):
         lsh_key = self._format_mongo_key(hash_name, bucket_key)
-        if mongo_fetch_vector_filters:
-            return self.mongo_object.find({'lsh': lsh_key,
-                                           **mongo_fetch_vector_filters})
-        else:
-            return self.mongo_object.find({'lsh': lsh_key})
+        return self.mongo_object.find({'lsh': lsh_key})
 
     def delete_vector(self, hash_name, bucket_keys, data):
         """
@@ -119,13 +110,12 @@ class MongoStorage(Storage):
         self.mongo_object.remove({'lsh': {'$in': lsh_keys},
                                   'data': data})
 
-    def get_bucket(self, hash_name, bucket_key, mongo_fetch_vector_filters=None):
+    def get_bucket(self, hash_name, bucket_key):
         """
         Returns bucket content as list of tuples (vector, data).
         """
         results = []
-        for row in self._get_bucket_rows(hash_name, bucket_key,
-                                         mongo_fetch_vector_filters):
+        for row in self._get_bucket_rows(hash_name, bucket_key):
             val_dict = row
             # Depending on type (sparse or not) reconstruct vector
             if 'sparse' in val_dict:
