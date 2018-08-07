@@ -36,5 +36,6 @@ setup(
         "pytest",
         "redis",
         "mockredispy",
+        "mongomock",
     ]
 )
