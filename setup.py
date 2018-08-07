@@ -24,7 +24,7 @@ setup(
     ],
     setup_requires=setup_requires,
     tests_require=[
-        "pytest",
+        "pytest<3.3",
         "redis",
         "mockredispy",
     ]
