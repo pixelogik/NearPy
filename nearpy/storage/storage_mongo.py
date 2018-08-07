@@ -94,8 +94,14 @@ class MongoStorage(Storage):
 
     def get_all_bucket_keys(self, hash_name):
         prefix_len = len(self._format_hash_prefix(hash_name))
-        return list(self.mongo_object.find(
+        return [key[prefix_len:]
+                for key in self._iter_bucket_keys(hash_name)]
+
+    def _iter_bucket_keys(self, hash_name):
+        result = list(self.mongo_object.find(
             {'lsh': {'$regex': self._format_hash_prefix(hash_name)}}))
+        keys = [r['lsh'] for r in result]
+        return keys
 
     def _get_bucket_rows(self, hash_name, bucket_key):
         lsh_key = self._format_mongo_key(hash_name, bucket_key)
@@ -137,18 +143,15 @@ class MongoStorage(Storage):
                 coo_data = numpy.array(data)
 
                 # Create COO sparse vector
-                vector = scipy.sparse.coo_matrix( (coo_data,(coo_row,coo_col)), shape=(val_dict['dim'],1) )
-                # Add data to result tuple, if present
-                [val_dict.pop(k) for k in 
-                 ['vector', 'nonzeros', 'sparse', 'dim', 'dtype' '_id']]
-                results.append((vector, val_dict))
+                vector = scipy.sparse.coo_matrix((coo_data, (coo_row, coo_col)),
+                                                 shape=(val_dict['dim'], 1))
 
             else:
                 vector = numpy.fromstring(val_dict['vector'],
                                           dtype=val_dict['dtype'])
                 [val_dict.pop(k) for k in ['vector', 'dtype', '_id']]
-                # Add data to result tuple, if present
-                results.append((vector, val_dict))
+            # Add data to result tuple, if present
+            results.append((vector, val_dict['data']))
 
         return results
 
