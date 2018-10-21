@@ -28,7 +28,9 @@
 # THE SOFTWARE.
 
 from future.utils import viewkeys
+from future.builtins import zip
 from nearpy.storage.storage import Storage
+import itertools
 
 
 class MemoryStorage(Storage):
@@ -49,6 +51,16 @@ class MemoryStorage(Storage):
         if not bucket_key in self.buckets[hash_name]:
             self.buckets[hash_name][bucket_key] = []
         self.buckets[hash_name][bucket_key].append((v, data))
+
+    def store_many_vectors(self, hash_name, bucket_keys, vs, data):
+        """
+        Store a batch of vectors.
+        Stores vector and JSON-serializable data in bucket with specified key.
+        """
+        if data is None:
+            data = itertools.repeat(data)
+        for v, k, d in zip(vs, bucket_keys, data):
+            self.store_vector(hash_name, k, v, d)
 
     def get_all_bucket_keys(self, hash_name):
         return viewkeys(self.buckets[hash_name])
