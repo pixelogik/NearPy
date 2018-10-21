@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
 setup_requires = ['pytest-runner>=2.0,<3.0'] if needs_pytest else []
@@ -10,16 +10,7 @@ setup(
     version='1.0.0',
     author='Ole Krause-Sparmann',
     author_email='ole@pixelogik.de',
-    packages=[
-        'nearpy',
-        'nearpy.distances',
-        'nearpy.experiments',
-        'nearpy.filters',
-        'nearpy.hashes',
-        'nearpy.hashes.permutation',
-        'nearpy.storage',
-        'nearpy.utils'
-    ],
+    packages=find_packages(exclude=["tests.*"]),
     url='https://github.com/pixelogik/NearPy',
     license='LICENSE.txt',
     description='Framework for fast approximated nearest neighbour search.',
@@ -33,7 +24,7 @@ setup(
     ],
     setup_requires=setup_requires,
     tests_require=[
-        "pytest",
+        "pytest<3.3",
         "redis",
         "mockredispy",
     ]
