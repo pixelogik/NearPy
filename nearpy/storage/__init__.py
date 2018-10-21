@@ -24,3 +24,4 @@ from __future__ import absolute_import
 from nearpy.storage.storage import Storage
 from nearpy.storage.storage_memory import MemoryStorage
 from nearpy.storage.storage_redis import RedisStorage
+from nearpy.storage.storage_mongo import MongoStorage

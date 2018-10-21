@@ -27,5 +27,6 @@ setup(
         "pytest<3.3",
         "redis",
         "mockredispy",
+        "mongomock",
     ]
 )

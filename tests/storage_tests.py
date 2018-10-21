@@ -25,11 +25,11 @@ import numpy
 import scipy
 
 from mockredis import MockRedis as Redis
-
+import mongomock
 from future.builtins import range
 from future.builtins import zip
 
-from nearpy.storage import MemoryStorage, RedisStorage
+from nearpy.storage import MemoryStorage, RedisStorage, MongoStorage
 
 
 class StorageTest(unittest.TestCase):
@@ -157,6 +157,33 @@ class RedisStorageTest(StorageTest):
     def test_store_many_vectors(self):
         x = numpy.random.randn(100, 10)
         self.check_store_many_vectors(x)
+
+class MongoStorageTest(StorageTest):
+    def setUp(self):
+        self.storage = MongoStorage(mongomock.MongoClient().db.collection)
+        super(MongoStorageTest, self).setUp()
+
+    def test_store_vector(self):
+        x = numpy.random.randn(100, 1).ravel()
+        self.check_store_vector(x)
+
+    def test_store_sparse_vector(self):
+        x = scipy.sparse.rand(100, 1, density=0.1)
+        self.check_store_vector(x)
+
+    def test_get_all_bucket_keys(self):
+        self.check_get_all_bucket_keys()
+
+    def test_delete_vector(self):
+        self.check_delete_vector(numpy.ones(100))
+
+    def test_store_zero(self):
+        x = numpy.ones(100)
+        hash_name, bucket_name = "tastHash", "testBucket"
+        self.storage.store_vector(hash_name, bucket_name, x, 0)
+        bucket = self.storage.get_bucket(hash_name, bucket_name)
+        _, data = bucket[0]
+        self.assertEqual(data, 0)
 
 
 if __name__ == '__main__':
