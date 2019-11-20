@@ -34,7 +34,11 @@ try:
 except ImportError:
     import pickle
 
-from future.builtins import bytes
+try:
+    from pymongo import InsertOne
+except ImportError:
+    pass
+
 from nearpy.storage.storage import Storage
 
 
@@ -45,7 +49,23 @@ class MongoStorage(Storage):
         """ Uses specified pymongo object for storage. """
         self.mongo_object = mongo_object
 
+    def store_many_vectors(self, hash_name, bucket_keys, vs, data):
+        requests = []
+
+        for v, d, bk in zip(vs, data, bucket_keys):
+            vc = self._get_vector(hash_name, bk, v, d)
+
+            requests.append(InsertOne(vc))
+
+        self.mongo_object.bulk_write(requests, ordered=False)
+
     def store_vector(self, hash_name, bucket_key, v, data):
+        val_dict = self._get_vector(hash_name, bucket_key, v, data)
+
+        # Push JSON representation of dict to end of bucket list
+        self.mongo_object.insert_one(val_dict)
+
+    def _get_vector(self, hash_name, bucket_key, v, data):
         """
         Stores vector and JSON-serializable data in MongoDB with specified key.
         """
@@ -83,8 +103,7 @@ class MongoStorage(Storage):
         if data is not None:
             val_dict['data'] = data
 
-        # Push JSON representation of dict to end of bucket list
-        self.mongo_object.insert_one(val_dict)
+        return val_dict
 
     def _format_mongo_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
@@ -186,5 +205,6 @@ class MongoStorage(Storage):
         conf = self.mongo_object.find_one(
             {'hash_conf_name': hash_name + '_conf'}
         )
+
         return pickle.loads(conf['hash_configuration']) if conf is not None\
             else None
