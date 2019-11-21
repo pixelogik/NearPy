@@ -40,6 +40,7 @@ except ImportError:
     pass
 
 from nearpy.storage.storage import Storage
+from future.builtins import zip
 
 
 class MongoStorage(Storage):
@@ -62,7 +63,6 @@ class MongoStorage(Storage):
     def store_vector(self, hash_name, bucket_key, v, data):
         val_dict = self._get_vector(hash_name, bucket_key, v, data)
 
-        # Push JSON representation of dict to end of bucket list
         self.mongo_object.insert_one(val_dict)
 
     def _get_vector(self, hash_name, bucket_key, v, data):
@@ -166,7 +166,7 @@ class MongoStorage(Storage):
                                                  shape=(val_dict['dim'], 1))
 
             else:
-                vector = numpy.fromstring(val_dict['vector'],
+                vector = numpy.frombuffer(val_dict['vector'],
                                           dtype=val_dict['dtype'])
                 [val_dict.pop(k) for k in ['vector', 'dtype', '_id']]
             # Add data to result tuple, if present
@@ -178,14 +178,14 @@ class MongoStorage(Storage):
         """
         Removes all buckets and their content for specified hash.
         """
-        self.mongo_object.remove(
+        self.mongo_object.delete_many(
             {'lsh': {'$regex': self._format_hash_prefix(hash_name)}})
 
     def clean_all_buckets(self):
         """
         Removes all buckets from all hashes and their content.
         """
-        self.mongo_object.remove(
+        self.mongo_object.delete_many(
             {'lsh': {'$regex': 'nearpy_'}})
 
     def store_hash_configuration(self, lshash):
