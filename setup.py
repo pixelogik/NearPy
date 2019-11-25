@@ -28,5 +28,6 @@ setup(
         "redis",
         "mockredispy",
         "mongomock",
+        "pymongo"
     ]
 )
