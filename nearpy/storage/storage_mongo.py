@@ -170,7 +170,7 @@ class MongoStorage(Storage):
                                                  shape=(val_dict['dim'], 1))
 
             else:
-                vector = numpy.fromstring(val_dict['vector'],
+                vector = numpy.frombuffer(val_dict['vector'],
                                           dtype=val_dict['dtype'])
                 [val_dict.pop(k) for k in ['vector', 'dtype', '_id']]
             # Add data to result tuple, if present
