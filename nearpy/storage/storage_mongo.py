@@ -29,6 +29,8 @@
 
 import numpy
 import scipy
+from nearpy.utils.utils import convert2unicode
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -63,7 +65,7 @@ class MongoStorage(Storage):
     def store_vector(self, hash_name, bucket_key, v, data):
         val_dict = self._get_vector(hash_name, bucket_key, v, data)
 
-        self.mongo_object.insert_one(val_dict)
+        self.mongo_object.insert_one(convert2unicode(val_dict))
 
     def _get_vector(self, hash_name, bucket_key, v, data):
         """
