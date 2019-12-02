@@ -65,7 +65,7 @@ class MongoStorage(Storage):
     def store_vector(self, hash_name, bucket_key, v, data):
         val_dict = self._get_vector(hash_name, bucket_key, v, data)
 
-        self.mongo_object.insert_one(convert2unicode(val_dict))
+        self.mongo_object.insert_one(val_dict)
 
     def _get_vector(self, hash_name, bucket_key, v, data):
         """
@@ -105,7 +105,7 @@ class MongoStorage(Storage):
         if data is not None:
             val_dict['data'] = data
 
-        return val_dict
+        return convert2unicode(val_dict)
 
     def _format_mongo_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
