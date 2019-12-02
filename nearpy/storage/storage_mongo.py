@@ -105,7 +105,9 @@ class MongoStorage(Storage):
         if data is not None:
             val_dict['data'] = data
 
-        return convert2unicode(val_dict)
+        convert2unicode(val_dict)
+
+        return val_dict
 
     def _format_mongo_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
