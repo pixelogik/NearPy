@@ -50,7 +50,7 @@ class RedisStorage(Storage):
         """
         Stores vector and JSON-serializable data in bucket with specified key.
         """
-        self._add_vector(hash_name, bucket_key, v, data, self.redis_object)
+        self._add_vector(hash_name, bucket_key, v, data)
 
     def store_many_vectors(self, hash_name, bucket_keys, vs, data):
         """
@@ -61,10 +61,10 @@ class RedisStorage(Storage):
             if data is None:
                 data = [None] * len(vs)
             for bucket_key, data, v in zip(bucket_keys, data, vs):
-                self._add_vector(hash_name, bucket_key, v, data, pipeline)
+                self._add_vector(hash_name, bucket_key, v, data)
             pipeline.execute()
 
-    def _add_vector(self, hash_name, bucket_key, v, data, redis_object):
+    def _add_vector(self, hash_name, bucket_key, v, data):
         '''
         Store vector and JSON-serializable data in bucket with specified key.
         '''
