@@ -50,7 +50,7 @@ class RedisStorage(Storage):
         """
         Stores vector and JSON-serializable data in bucket with specified key.
         """
-        self._add_vector(hash_name, bucket_key, v, data)
+        self._add_vector(hash_name, bucket_key, v, data, self.redis_object)
 
     def store_many_vectors(self, hash_name, bucket_keys, vs, data):
         """
@@ -61,10 +61,10 @@ class RedisStorage(Storage):
             if data is None:
                 data = [None] * len(vs)
             for bucket_key, data, v in zip(bucket_keys, data, vs):
-                self._add_vector(hash_name, bucket_key, v, data)
+                self._add_vector(hash_name, bucket_key, v, data, pipeline)
             pipeline.execute()
 
-    def _add_vector(self, hash_name, bucket_key, v, data):
+    def _add_vector(self, hash_name, bucket_key, v, data, redis_object):
         '''
         Store vector and JSON-serializable data in bucket with specified key.
         '''
@@ -102,7 +102,7 @@ class RedisStorage(Storage):
             val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
-        self.redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
+        redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
 
     def _format_redis_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
