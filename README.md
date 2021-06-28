@@ -75,7 +75,7 @@ clean_buckets(self, hash_name)
 ```
 ## Hashes
 
-All LSH implementatiosn in NearPy do subclass nearpy.hashes.LSHash, which has one main method, besides
+All LSH implementation in NearPy do subclass nearpy.hashes.LSHash, which has one main method, besides
 constructor and reset methods.
 
 ```python

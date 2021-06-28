@@ -24,7 +24,7 @@
 class VectorFilter(object):
     """
     Interface for vector-list filters. They get either (vector, data, distance)
-    tupes or (vector, data) tuples and return subsets of them.
+    tuples or (vector, data) tuples and return subsets of them.
 
     Some filters work on lists of (vector, data, distance) tuples, others work
     on lists of (vector, data) tuples and others work on both types.

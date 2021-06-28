@@ -33,7 +33,7 @@ class HashPermutations(LSHash):
     This meta-hash performs hash permutations on binary bucket keys.
     You use this just like every other LSHash implementation and
     add the actual binary hashes you want to use via the add_child_hash
-    method. Each child hash will be used separatly.
+    method. Each child hash will be used separately.
 
     After all vectors have been indexed you have to call build_permuted_index
     to generate the permuted index.
