@@ -75,7 +75,7 @@ class MongoStorage(Storage):
         else:
             # Make sure it is a 1d vector
             v = numpy.reshape(v, v.shape[0])
-            val_dict['vector'] = v.tostring()
+            val_dict['vector'] = v.tobytes()
 
         val_dict['dtype'] = v.dtype.name
 
@@ -113,7 +113,7 @@ class MongoStorage(Storage):
         """
         lsh_keys = [self._format_mongo_key(hash_name, key)
                     for key in bucket_keys]
-        self.mongo_object.remove({'lsh': {'$in': lsh_keys},
+        self.mongo_object.delete_many({'lsh': {'$in': lsh_keys},
                                   'data': data})
 
     def get_bucket(self, hash_name, bucket_key):
@@ -147,7 +147,7 @@ class MongoStorage(Storage):
                                                  shape=(val_dict['dim'], 1))
 
             else:
-                vector = numpy.fromstring(val_dict['vector'],
+                vector = numpy.frombuffer(val_dict['vector'],
                                           dtype=val_dict['dtype'])
                 [val_dict.pop(k) for k in ['vector', 'dtype', '_id']]
             # Add data to result tuple, if present
@@ -159,14 +159,14 @@ class MongoStorage(Storage):
         """
         Removes all buckets and their content for specified hash.
         """
-        self.mongo_object.remove(
+        self.mongo_object.delete_many(
             {'lsh': {'$regex': self._format_hash_prefix(hash_name)}})
 
     def clean_all_buckets(self):
         """
         Removes all buckets from all hashes and their content.
         """
-        self.mongo_object.remove(
+        self.mongo_object.delete_many(
             {'lsh': {'$regex': 'nearpy_'}})
 
     def store_hash_configuration(self, lshash):

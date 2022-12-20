@@ -93,7 +93,7 @@ class RedisStorage(Storage):
         else:
             # Make sure it is a 1d vector
             v = numpy.reshape(v, v.shape[0])
-            val_dict['vector'] = v.tostring()
+            val_dict['vector'] = v.tobytes()
 
         val_dict['dtype'] = v.dtype.name
 
@@ -173,7 +173,7 @@ class RedisStorage(Storage):
                 vector = scipy.sparse.coo_matrix((coo_data, (coo_row, coo_col)), shape=(val_dict['dim'], 1))
 
             else:
-                vector = numpy.fromstring(val_dict['vector'],
+                vector = numpy.frombuffer(val_dict['vector'],
                                           dtype=val_dict['dtype'])
 
             # Add data to result tuple, if present

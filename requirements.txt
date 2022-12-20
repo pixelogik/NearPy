@@ -1,6 +1,6 @@
-numpy
-scipy
-bitarray
-future
-mockredispy
-mongomock
+numpy==1.24.0
+scipy==1.9.3
+bitarray==2.6.1
+future==0.18.2
+mockredispy==2.9.3
+mongomock==4.1.2

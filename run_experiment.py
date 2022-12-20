@@ -15,12 +15,12 @@ vector_count = 100000
 vectors = []
 
 center = numpy.random.randn(dimension)
-for index in xrange(vector_count/2):
+for index in range(int(vector_count/2)):
     vector = center + 0.01 * numpy.random.randn(dimension)
     vectors.append(vector)
 
 center = numpy.random.randn(dimension)
-for index in xrange(vector_count/2):
+for index in range(int(vector_count/2)):
     vector = center + 0.01 * numpy.random.randn(dimension)
     vectors.append(vector)
 
@@ -31,7 +31,7 @@ nearest = NearestFilter(N)
 # We will fill this array with all the engines we want to test
 engines = []
 
-print 'Creating engines...'
+print('Creating engines...')
 
 # We are going to test these bin widths
 bin_widths = [ 0.01 * x for x in range(1,5)]
@@ -53,14 +53,14 @@ for bin_width in bin_widths:
     # Add engine to list of engines to evaluate
     engines.append(engine)
 
-print 'Creating experiment and performing exact search...'
+print('Creating experiment and performing exact search...')
 
 # Create experiment (looking for ten closest neighbours).
 # The constructor performs exact search for evaluation.
 # So the data set should not be too large for experiments.
 exp = DistanceRatioExperiment(N, vectors, coverage_ratio=0.01)
 
-print 'Performing experiment for all engines...'
+print('Performing experiment for all engines...')
 
 # Perform experiment for all engines
 result = exp.perform_experiment(engines)

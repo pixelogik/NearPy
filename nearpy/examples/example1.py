@@ -87,7 +87,7 @@ def example1():
 
     # First index some random vectors
     matrix = numpy.zeros((POINTS,DIM))
-    for i in xrange(POINTS):
+    for i in range(POINTS):
         v = numpy.random.randn(DIM)
         matrix[i, :] = nearpy.utils.utils.unitvec(v)
         engine.store_vector(v, i)

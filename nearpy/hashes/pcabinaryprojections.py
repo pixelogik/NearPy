@@ -65,7 +65,7 @@ class PCABinaryProjections(LSHash):
 
             # Get largest N eigenvalue/eigenvector indices
             largest_eigenvalue_indices = numpy.flipud(
-                scipy.argsort(eigenvalues))[:projection_count]
+                numpy.argsort(eigenvalues))[:projection_count]
 
             # Create matrix for first N principal components
             self.components = numpy.zeros((self.dim,

@@ -119,7 +119,7 @@ class DistanceRatioExperiment(object):
             exact_search_time = time.time() - exact_search_start_time
             self.exact_search_time_per_vector += exact_search_time
 
-        print('\Done with exact search...\n')
+        print('Done with exact search...\n')
 
         # Normalize search time
         self.exact_search_time_per_vector /= float(len(self.query_indices))

@@ -91,7 +91,7 @@ class RecallPrecisionExperiment(object):
             v = self.vectors[index, numpy.newaxis]
             exact_search_start_time = time.time()
             D = cdist(v, self.vectors, 'euclidean')
-            self.closest[index] = scipy.argsort(D)[0, 1:N+1]
+            self.closest[index] = numpy.argsort(D)[0, 1:N+1]
 
             # Save time needed for exact search
             exact_search_time = time.time() - exact_search_start_time

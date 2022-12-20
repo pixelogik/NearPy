@@ -17,16 +17,16 @@ setup(
     keywords='nearpy approximate nearest neighbour',
     long_description=open('README.txt').read(),
     install_requires=[
-        "numpy",
-        "scipy",
-        "bitarray",
-        "future",
+        "numpy==1.24.0",
+        "scipy==1.9.3",
+        "bitarray==2.6.1",
+        "future==0.18.2",
     ],
     setup_requires=setup_requires,
     tests_require=[
-        "pytest<3.3",
-        "redis",
-        "mockredispy",
-        "mongomock",
+        "pytest==7.2.0",
+        "redis==4.4.0",
+        "mockredispy==2.9.3",
+        "mongomock==4.1.2",
     ]
 )
