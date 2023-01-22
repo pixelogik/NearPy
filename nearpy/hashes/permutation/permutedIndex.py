@@ -53,7 +53,7 @@ class PermutedIndex:
     and we want to find the 1-neighbour of '00001'.
 
     If we just sort the original list, i.e. ['00001','00011','00111','01111','10000'],
-    the 1-neighbour of '00001' in the sorted list, '00011', is not the cloest neighbour
+    the 1-neighbour of '00001' in the sorted list, '00011', is not the closest neighbour
     in term of Hamming distance.
 
     Here's an approximate solution:
@@ -141,7 +141,7 @@ class PermutedIndex:
             topk = topk.union(set(candidates))
         topk = list(topk)
 
-        # sort the topk neighbour keys according to the Hamming distance to qurey key
+        # sort the topk neighbour keys according to the Hamming distance to query key
         topk = sorted(topk, key=lambda x: self.hamming_distance(x, query_key))
         # return the top k items
         topk_bin = [x.to01() for x in topk[:k]]

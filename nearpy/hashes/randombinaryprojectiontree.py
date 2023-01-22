@@ -48,7 +48,7 @@ class RandomBinaryProjectionTreeNode(object):
         if tree_depth < len(bucket_key):
             hash_char = bucket_key[tree_depth]
 
-            # This is not the leaf so continue down into the tree towards the leafes
+            # This is not the leaf so continue down into the tree towards the leaves
 
             #print 'hash_char=%c' % hash_char
 

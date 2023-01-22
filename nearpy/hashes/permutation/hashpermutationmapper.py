@@ -32,7 +32,7 @@ class HashPermutationMapper(LSHash):
 
     You use this just like every other LSHash implementation and
     add the actual binary hashes you want to use via the add_child_hash
-    method. Each child hash will be used separatly.
+    method. Each child hash will be used separately.
 
     So to use this you have to do the following steps:
 
@@ -88,7 +88,7 @@ class HashPermutationMapper(LSHash):
                 for bucket_key in lshash.hash_vector(v, querying):
                     # Get permuted keys
                     perm_keys = self.permuted_keys(bucket_key)
-                    # Put extact hit key into list
+                    # Put exact hit key into list
                     perm_keys.append(bucket_key)
 
                     # Append key for storage (not the permutations)

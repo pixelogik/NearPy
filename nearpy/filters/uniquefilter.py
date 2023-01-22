@@ -29,7 +29,7 @@ from nearpy.filters.vectorfilter import VectorFilter
 class UniqueFilter(VectorFilter):
     """
     Makes sure that each vectors is only once in the vector list. Works on
-    both types of vector listst - (vector, data, distance) and
+    both types of vector lists - (vector, data, distance) and
     (vector, data).
 
     This filter uses the 'data' as key for uniqueness. If you need some
