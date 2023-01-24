@@ -1,5 +1,5 @@
 numpy==1.21.6
-scipy==1.9.3
+scipy==1.7.3
 bitarray==2.6.1
 future==0.18.2
 mockredispy==2.9.3
