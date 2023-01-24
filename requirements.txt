@@ -1,4 +1,4 @@
-numpy==1.24.0
+numpy==1.21.6
 scipy==1.9.3
 bitarray==2.6.1
 future==0.18.2
