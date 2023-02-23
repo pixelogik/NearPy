@@ -81,7 +81,7 @@ class Engine(object):
         for lshash in self.lshashes:
             lshash.reset(dim)
 
-    def store_vector(self, v, data=None):
+    def store_vector(self, v, data=None, key_suffix=''):
         """
         Hashes vector v and stores it in all matching buckets in the storage.
         The data argument must be JSON-serializable. It is stored with the
@@ -93,10 +93,10 @@ class Engine(object):
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v):
                 #print 'Storying in bucket %s one vector' % bucket_key
-                self.storage.store_vector(lshash.hash_name, bucket_key,
+                self.storage.store_vector(lshash.hash_name+key_suffix, bucket_key,
                                           nv, data)
 
-    def store_many_vectors(self, vs, data=None):
+    def store_many_vectors(self, vs, data=None, key_suffix=''):
         """
         Store a batch of vectors.
         Hashes vector vs and stores them in all matching buckets in the storage.
@@ -109,10 +109,10 @@ class Engine(object):
         # Store vector in each bucket of all hashes
         for lshash in self.lshashes:
             bucket_keys = [lshash.hash_vector(i)[0] for i in vs]
-            self.storage.store_many_vectors(lshash.hash_name, bucket_keys,
+            self.storage.store_many_vectors(lshash.hash_name+key_suffix, bucket_keys,
                                             nvs, data)
 
-    def delete_vector(self, data, v=None):
+    def delete_vector(self, data, v=None, key_suffix=''):
         """
         Deletes vector v and his id (data) in all matching buckets in the storage.
         The data argument must be JSON-serializable.
@@ -121,10 +121,10 @@ class Engine(object):
         # Delete data id in each hashes
         for lshash in self.lshashes:
             if v is None:
-                keys = self.storage.get_all_bucket_keys(lshash.hash_name)
+                keys = self.storage.get_all_bucket_keys(lshash.hash_name+key_suffix)
             else:
                 keys = lshash.hash_vector(v)
-            self.storage.delete_vector(lshash.hash_name, keys, data)
+            self.storage.delete_vector(lshash.hash_name+key_suffix, keys, data)
 
     def candidate_count(self, v):
         """
@@ -146,7 +146,7 @@ class Engine(object):
     def neighbours(self, v,
                    distance=None,
                    fetch_vector_filters=None,
-                   vector_filters=None):
+                   vector_filters=None, key_suffix=''):
         """
         Hashes vector v, collects all candidate vectors from the matching
         buckets in storage, applys the (optional) distance function and
@@ -155,7 +155,7 @@ class Engine(object):
         """
 
         # Collect candidates from all buckets from all hashes
-        candidates = self._get_candidates(v)
+        candidates = self._get_candidates(v, key_suffix)
         # print 'Candidate count is %d' % len(candidates)
 
         # Apply fetch vector filters if specified and return filtered list
@@ -177,13 +177,13 @@ class Engine(object):
         return candidates
 
 
-    def _get_candidates(self, v):
+    def _get_candidates(self, v, key_suffix=''):
         """ Collect candidates from all buckets from all hashes """
         candidates = []
         for lshash in self.lshashes:
             for bucket_key in lshash.hash_vector(v, querying=True):
                 bucket_content = self.storage.get_bucket(
-                    lshash.hash_name,
+                    lshash.hash_name+key_suffix,
                     bucket_key,
                 )
                 #print 'Bucket %s size %d' % (bucket_key, len(bucket_content))
@@ -216,6 +216,6 @@ class Engine(object):
         """ Clears buckets in storage (removes all vectors and their data). """
         self.storage.clean_all_buckets()
 
-    def clean_buckets(self, hash_name):
+    def clean_buckets(self, hash_name, key_suffix=''):
         """ Clears buckets in storage (removes all vectors and their data). """
-        self.storage.clean_buckets(hash_name)
+        self.storage.clean_buckets(hash_name+key_suffix)

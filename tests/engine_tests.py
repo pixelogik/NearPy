@@ -62,6 +62,20 @@ class TestEngine(unittest.TestCase):
             self.assertEqual(y_data, x_data)
             self.assertAlmostEqual(y_distance, 0.0, delta=delta)
 
+    def test_retrieval_with_suffixes(self):
+        for k in range(100):
+            self.engine.clean_all_buckets()
+            x = numpy.random.randn(1000)
+            x_data = 'data'
+            self.engine.store_vector(x, x_data, key_suffix='added_to_key')
+            n = self.engine.neighbours(x, key_suffix='added_to_key')
+            y, y_data, y_distance  = n[0]
+            normalized_x = unitvec(x)
+            delta = 0.000000001
+            self.assertAlmostEqual(numpy.abs((normalized_x - y)).max(), 0, delta=delta)
+            self.assertEqual(y_data, x_data)
+            self.assertAlmostEqual(y_distance, 0.0, delta=delta)
+
     def test_retrieval_sparse(self):
         for k in range(100):
             self.engine.clean_all_buckets()
@@ -84,26 +98,26 @@ class TestDelete(unittest.TestCase):
         self.removed_value = 15
         self.removed_vector = numpy.ones(self.dim) * self.removed_value
 
-    def get_keys(self, engine):
-        def get_bucket_keys(lshash):
-            bucket = engine.storage.buckets[lshash.hash_name][lshash.hash_name]
+    def get_keys(self, engine, key_suffix=''):
+        def get_bucket_keys(lshash, key_suffix=''):
+            bucket = engine.storage.buckets[lshash.hash_name+key_suffix][lshash.hash_name]
             return (i for v, i in bucket)
 
         return set(itertools.chain.from_iterable(
-            get_bucket_keys(lshash) for lshash in engine.lshashes))
+            get_bucket_keys(lshash, key_suffix) for lshash in engine.lshashes))
 
-    def fill_engine(self, engine):
+    def fill_engine(self, engine, key_suffix=''):
         # Index 20 vectors (set their data to a unique string)
         for index in self.all_values:
             v = numpy.ones(self.dim) * index
-            engine.store_vector(v, index)
-        self.assertSequenceEqual(sorted(self.get_keys(engine)),
+            engine.store_vector(v, index, key_suffix=key_suffix)
+        self.assertSequenceEqual(sorted(self.get_keys(engine, key_suffix)),
                                  self.all_values)
 
-    def check_delete(self, engine):
+    def check_delete(self, engine, key_suffix=''):
         expected_values = self.all_values
         expected_values.remove(self.removed_value)
-        self.assertSequenceEqual(sorted(self.get_keys(engine)), expected_values)
+        self.assertSequenceEqual(sorted(self.get_keys(engine, key_suffix)), expected_values)
 
     def test_delete_vector_single_hash(self):
         engine = Engine(self.dim, lshashes=[UniBucket('testHash')])
@@ -123,6 +137,12 @@ class TestDelete(unittest.TestCase):
         self.fill_engine(engine)
         engine.delete_vector(self.removed_value, self.removed_vector)
         self.check_delete(engine)
+
+    def test_delete_vector_with_provided_value_and_suffixes(self):
+        engine = Engine(self.dim, lshashes=[UniBucket('testHash')])
+        self.fill_engine(engine, key_suffix='added_to_key')
+        engine.delete_vector(self.removed_value, self.removed_vector, key_suffix='added_to_key')
+        self.check_delete(engine, key_suffix='added_to_key')
 
 
 if __name__ == '__main__':
