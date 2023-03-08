@@ -102,7 +102,7 @@ class RedisStorage(Storage):
             val_dict['data'] = data
 
         # Push JSON representation of dict to end of bucket list
-        self.redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
+        redis_object.rpush(redis_key, pickle.dumps(val_dict, protocol=2))
 
     def _format_redis_key(self, hash_name, bucket_key):
         return '{}{}'.format(self._format_hash_prefix(hash_name), bucket_key)
