@@ -90,3 +90,10 @@ def want_string(arg, encoding='utf-8'):
         rv = arg
     return rv
 
+
+def convert2unicode(mydict):
+    for k, v in mydict.iteritems():
+        if isinstance(v, str):
+            mydict[k] = unicode(v, errors='replace')
+        elif isinstance(v, dict):
+            convert2unicode(v)

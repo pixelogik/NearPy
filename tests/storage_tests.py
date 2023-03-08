@@ -185,6 +185,10 @@ class MongoStorageTest(StorageTest):
         _, data = bucket[0]
         self.assertEqual(data, 0)
 
+    def test_store_many_vectors(self):
+        x = numpy.random.randn(100, 10)
+        self.check_store_many_vectors(x)
+
 
 if __name__ == '__main__':
     unittest.main()
